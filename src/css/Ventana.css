@@ -1,0 +1,53 @@
+/* ===== Estilos de la ventana modal ===== */
+
+/* Fondo oscuro + centrado */
+.ventana-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+}
+
+/* Contenido del modal (controla tamaño y centrado responsivo) */
+.ventana-content {
+  background: #fff; /* 👈 fondo blanco para el card */
+  border-radius: 10px;
+  padding: 0rem;
+  width: 55%; /* PC */
+  max-height: 90vh;
+  overflow-y: auto; /* scroll si el form es largo */
+}
+
+/* 📱 En pantallas pequeñas */
+@media (max-width: 900px) {
+  .ventana-content {
+    width: 80%; /* móvil */
+  }
+}
+
+/* ===== Estilos del formulario de registro ===== */
+.login-container {
+  width: 100%; /* ahora toma el ancho del contenedor padre */
+}
+
+/* Logo responsivo */
+.login-logo {
+  display: block;
+  margin: 0 auto;
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .login-logo {
+    width: 150px;
+    height: 150px;
+  }
+}

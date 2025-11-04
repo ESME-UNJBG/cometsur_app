@@ -1,0 +1,34 @@
+.qr-container {
+  text-align: center;
+}
+
+.qr-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.qr-code {
+  width: auto;
+  height: auto;
+}
+
+.user-icon {
+  width: 90px;
+  height: 90px;
+  fill: #000;
+}
+
+.user-name {
+  margin-top: 10px;
+  font-size: 0.6rem;
+}
+
+/* 📱 Solo agrandar el QR en celular */
+@media (max-width: 768px) {
+  .qr-code {
+    width: 160px !important;
+    height: 160px !important;
+  }
+}

@@ -1,0 +1,31 @@
+.imagen-container {
+  margin-left: 32%;
+  margin-right: 32%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 45px;
+}
+
+.imagen-container img {
+  object-fit: contain;
+}
+
+/* 📱 Ajustes para pantallas pequeñas */
+@media (max-width: 768px) {
+  .imagen-container {
+    margin-left: 5%;
+    margin-right: 5%;
+    gap: 15px;
+  }
+
+  .imagen-container img:first-child {
+    width: 40% !important; /* logo/cometsur */
+    height: auto;
+  }
+
+  .imagen-container img:last-child {
+    width: 60% !important; /* banner */
+    height: auto;
+  }
+}

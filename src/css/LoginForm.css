@@ -1,0 +1,31 @@
+/* Contenedor del login */
+div.login-container {
+  width: 45% !important; /* 👈 fuerza tu ancho */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 📱 En pantallas pequeñas */
+@media (max-width: 900px) {
+  div.login-container {
+    width: 85% !important;
+  }
+}
+
+/* Logo responsivo */
+.login-logo {
+  display: block;
+  margin: 0 auto;
+  width: 120px;
+  height: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .login-logo {
+    width: 150px;
+    height: 150px;
+  }
+}
