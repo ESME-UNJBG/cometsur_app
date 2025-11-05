@@ -1,4 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
+
+// El resto de tu código igual...
 import ProtectedRoute from "./private/proRuts";
 import useActualizarUsuario from "./hook/useAct";
 
@@ -10,7 +12,6 @@ import QrMod from "./pages/Qr_moderador";
 import PilaMod from "./pages/Pila_moderador";
 
 const App: React.FC = () => {
-  // ✅ Activa el hook global que refresca el rol cada 3s
   useActualizarUsuario();
 
   return (
