@@ -51,7 +51,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     "trashmail.com",
   ];
 
-  // Lista de palabras que deben mantenerse en minúscula (excepto si son la primera palabra)
+  const validDomains = [
+    "gmail.com",
+    "hotmail.com",
+    "outlook.com",
+    "live.com",
+    "yahoo.com",
+    "unjbg.edu.pe",
+  ];
+
   const palabrasMinusculas = [
     "de",
     "la",
@@ -81,24 +89,17 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     "mediante",
   ];
 
-  // Función para capitalizar cada palabra del nombre, respetando las excepciones
   const capitalizeWords = (text: string): string => {
     if (!text) return text;
-
     const words = text.toLowerCase().split(" ");
 
     const processedWords = words.map((word, index) => {
-      // Si es la primera palabra, siempre va con mayúscula
       if (index === 0) {
         return word.charAt(0).toUpperCase() + word.slice(1);
       }
-
-      // Si la palabra está en la lista de excepciones, se mantiene en minúscula
       if (palabrasMinusculas.includes(word)) {
         return word;
       }
-
-      // Para palabras con guiones, procesar cada parte
       if (word.includes("-")) {
         const parts = word.split("-");
         const processedParts = parts.map((part) => {
@@ -109,15 +110,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         });
         return processedParts.join("-");
       }
-
-      // En cualquier otro caso, capitalizar
       return word.charAt(0).toUpperCase() + word.slice(1);
     });
 
     return processedWords.join(" ");
   };
 
-  // función centralizada para resetear form
   const resetForm = () => {
     setFormData({ name: "", email: "", password: "" });
     setValidated(false);
@@ -130,33 +128,32 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
   useEffect(() => {
     resetForm();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (show) {
-      resetForm();
-    }
+    if (show) resetForm();
   }, [show]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    // 🔽 APLICAR CAPITALIZACIÓN SOLO PARA EL CAMPO NAME
     if (name === "name") {
       setFormData((prev) => ({ ...prev, [name]: capitalizeWords(value) }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
 
-    if (name === "email" && emailType === "temporal") {
+    // 🔹 Sugerencias tanto para Válido como para Temporal
+    if (name === "email") {
       if (value.includes("@")) {
         const afterAt = value.split("@")[1] || "";
-        const filtered = temporalDomains.filter((domain) =>
+        const domainList =
+          emailType === "temporal" ? temporalDomains : validDomains;
+        const filtered = domainList.filter((domain) =>
           domain.startsWith(afterAt)
         );
         setFilteredDomains(filtered);
-        setShowSuggestions(true);
+        setShowSuggestions(filtered.length > 0);
       } else {
         setShowSuggestions(false);
       }
@@ -174,7 +171,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     setShowSuggestions(false);
   };
 
-  // Generador de contraseñas aleatorias
   const generatePassword = () => {
     const chars =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -264,7 +260,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               autoComplete="name"
               placeholder="Ej: Juan Pérez de la Garza"
             />
-            <div className="form-text"></div>
           </div>
 
           <div className="col-md-12 mb-3 position-relative">
