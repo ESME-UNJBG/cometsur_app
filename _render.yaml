@@ -1,4 +1,10 @@
-routes:
-  - type: rewrite
-    source: /*
-    destination: /index.html
+services:
+  - type: web
+    name: cometsur_app # nombre de tu servicio
+    env: static
+    buildCommand: npm install && npm run build
+    publishPath: build # carpeta donde React genera los archivos
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
