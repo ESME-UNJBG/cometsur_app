@@ -1,8 +1,8 @@
+// src/App.tsx
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
-
-// El resto de tu código igual...
 import ProtectedRoute from "./private/proRuts";
-import useActualizarUsuario from "./hook/useAct";
+import useUserSession from "./hook/useUserSession";
+import SmartUpdateIndicator from "./Fuciones/SmartUpdateIndicator"; // ✅ Nuevo componente
 
 import Login from "./pages/Login";
 import Home from "./pages/Home";
@@ -12,10 +12,14 @@ import QrMod from "./pages/Qr_moderador";
 import PilaMod from "./pages/Pila_moderador";
 
 const App: React.FC = () => {
-  useActualizarUsuario();
+  // ✅ Hook silencioso que se inicializa automáticamente
+  useUserSession();
 
   return (
     <Router>
+      {/* ✅ Indicador inteligente global - Solo aparece con cambios */}
+      <SmartUpdateIndicator />
+
       <Routes>
         {/* Login libre */}
         <Route path="/" element={<Login />} />

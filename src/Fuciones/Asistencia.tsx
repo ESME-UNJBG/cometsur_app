@@ -1,24 +1,7 @@
-import { useState, useEffect } from "react";
-import useActualizarUsuario from "../hook/useAct"; // 👈 importa tu hook
+import useUserSession from "../hook/useUserSession";
 
 const Asistencia = () => {
-  // Estado para reflejar el valor de asistencia
-  const [asistencia, setAsistencia] = useState<string | null>(
-    localStorage.getItem("UserAsistencia")
-  );
-
-  // ✅ Llama al hook que actualiza el localStorage cada 3s
-  useActualizarUsuario();
-
-  // ✅ Cada segundo revisamos si cambió en localStorage y actualizamos estado
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const nuevaAsistencia = localStorage.getItem("UserAsistencia");
-      setAsistencia(nuevaAsistencia);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
+  const { asistencia } = useUserSession();
 
   return (
     <div
@@ -49,29 +32,17 @@ const Asistencia = () => {
             alignItems: "center",
           }}
         >
-          {asistencia ? (
-            <p
-              className="card-text"
-              style={{
-                padding: "4px 6px",
-                marginBottom: "0",
-                textAlign: "center",
-              }}
-            >
-              {asistencia}/4
-            </p>
-          ) : (
-            <p
-              className="card-text"
-              style={{
-                padding: "5px",
-                marginBottom: "0",
-                textAlign: "center",
-              }}
-            >
-              asistencia
-            </p>
-          )}
+          <p
+            className="card-text"
+            style={{
+              padding: "4px 6px",
+              marginBottom: "0",
+              textAlign: "center",
+              fontWeight: "bold",
+            }}
+          >
+            {asistencia !== null ? `${asistencia}/4` : "0/4"}
+          </p>
         </div>
       </div>
     </div>

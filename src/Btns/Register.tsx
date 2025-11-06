@@ -30,6 +30,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     name: "",
     email: "",
     password: "",
+    university: "", // ✅ Nuevo campo
+    importe: "", // ✅ Nuevo campo
+    category: "", // ✅ Nuevo campo
   });
   const [validated, setValidated] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -58,6 +61,23 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     "live.com",
     "yahoo.com",
     "unjbg.edu.pe",
+  ];
+
+  // ✅ Opciones predefinidas para Universidad
+  const universityOptions = [
+    "UNJBG - Universidad Nacional Jorge Basadre Grohmann",
+    "UNSAAC - Universidad Nacional de San Antonio Abad del Cuzco",
+    "UPT - Universidad Privada de Tacna",
+    "OTRA - Otra universidad",
+  ];
+
+  // ✅ Opciones predefinidas para Categoría
+  const categoryOptions = [
+    "Estudiante",
+    "Egresado",
+    "Docente",
+    "Profesional",
+    "externo",
   ];
 
   const palabrasMinusculas = [
@@ -117,7 +137,14 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   };
 
   const resetForm = () => {
-    setFormData({ name: "", email: "", password: "" });
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+      university: "", // ✅ Resetear nuevos campos
+      importe: "",
+      category: "",
+    });
     setValidated(false);
     setLoading(false);
     setErrorMsg(null);
@@ -134,7 +161,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     if (show) resetForm();
   }, [show]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
 
     if (name === "name") {
@@ -197,9 +226,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     setErrorMsg(null);
 
     try {
+      // ✅ Preparar datos para enviar (convertir importe a número)
+      const dataToSend = {
+        ...formData,
+        importe: parseInt(formData.importe) || 0, // Convertir a número
+      };
+
       const response: AxiosResponse<RegisterResponse> = await axios.post(
         "https://cometsur-api.onrender.com/auth/register",
-        formData,
+        dataToSend,
         { headers: { "Content-Type": "application/json" } }
       );
 
@@ -327,6 +362,64 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 ))}
               </ul>
             )}
+          </div>
+
+          {/* ✅ NUEVA FILA CON LOS TRES CAMPOS - AMBOS CON SELECT */}
+          <div className="row mb-3">
+            <div className="col-md-4">
+              <label className="form-label">Universidad:</label>
+              <select
+                className="form-select"
+                name="university"
+                value={formData.university}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              >
+                <option value="">Selecc. universidad</option>
+                {universityOptions.map((university) => (
+                  <option key={university} value={university}>
+                    {university}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="col-md-4">
+              <label className="form-label">Importe:</label>
+              <input
+                type="number"
+                className="form-control"
+                name="importe"
+                value={formData.importe}
+                onChange={handleChange}
+                required
+                disabled={loading}
+                autoComplete="importe"
+                placeholder="Ej: 30"
+                min="0"
+                step="1"
+              />
+            </div>
+
+            <div className="col-md-4">
+              <label className="form-label">Categoría:</label>
+              <select
+                className="form-select"
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              >
+                <option value="">Selecc. categoría</option>
+                {categoryOptions.map((category) => (
+                  <option key={category} value={category}>
+                    {category.charAt(0).toUpperCase() + category.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           <div className="col-md-12 mb-3">
