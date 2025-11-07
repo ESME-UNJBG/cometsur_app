@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../css/Ventana.css";
-import ComputadoraModal from "..//accesos/comp_Es"; // 👈 importar el nuevo modal
+import ComputadoraModal from "../accesos/comp_Es"; // 👈 importar el nuevo modal
 import CelularModal from "../accesos/cel_Es";
 interface EsProps {
   onClose: () => void;

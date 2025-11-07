@@ -1,4 +1,4 @@
-import React, { useEffect, useState, ChangeEvent } from "react";
+import React, { useEffect, useState, useRef, ChangeEvent } from "react";
 import "../css/Ventana.css";
 
 interface ComputadoraModalProps {
@@ -24,9 +24,13 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
 
   const [sending, setSending] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null); // 🆕 MENSAJE DE ÉXITO
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  const isMounted = useRef(true);
 
   useEffect(() => {
+    isMounted.current = true;
+
     const stored = localStorage.getItem("usuarios");
     if (!stored) return;
     try {
@@ -35,6 +39,10 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     } catch {
       setUsuarios([]);
     }
+
+    return () => {
+      isMounted.current = false;
+    };
   }, []);
 
   const filteredData = usuarios.filter((u) =>
@@ -45,7 +53,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     setSearchTerm(user.name);
     setSelectedUser({ ...user });
     setErrorMsg(null);
-    setSuccessMsg(null); // 🆕 LIMPIAR MENSAJES ANTERIORES
+    setSuccessMsg(null);
   };
 
   const handleChangeName = (e: ChangeEvent<HTMLInputElement>) =>
@@ -87,7 +95,6 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     try {
       console.log("📤 Enviando actualización...", body);
 
-      // 🆕 PETICIÓN OPTIMIZADA PARA FRONTEND
       const res = await fetch(
         `https://cometsur-api.onrender.com/users/${selectedUser.id}`,
         {
@@ -104,34 +111,35 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
 
       console.log("📥 Respuesta recibida:", res.status, res.statusText);
 
-      // 🆕 VERIFICAR SI LA RESPUESTA ES OK
       if (res.ok) {
         const responseData = await res.json().catch(() => null);
         console.log("✅ Actualización exitosa:", responseData);
 
-        // 🆕 ACTUALIZAR LISTA LOCAL
+        if (!isMounted.current) return;
+
+        // Actualizar lista local y localStorage
         const nuevos = usuarios.map((u) =>
           u.id === selectedUser.id ? { ...u, ...body } : u
         );
         setUsuarios(nuevos);
         localStorage.setItem("usuarios", JSON.stringify(nuevos));
 
-        // 🆕 MOSTRAR MENSAJE DE ÉXITO
         setSuccessMsg("✅ Usuario actualizado correctamente");
-
-        // 🆕 RESETEAR CAMPOS Y CHECKBOXES
         setUpdateName(false);
         setUpdatePassword(false);
         setUpdateGmail(false);
-        setSelectedUser(null);
-        setSearchTerm("");
 
-        // 🆕 CERRAR MODAL DESPUÉS DE 1.5 SEGUNDOS (OPCIONAL)
+        // Cerrar modal de forma segura después de 1.5 segundos
         setTimeout(() => {
+          if (!isMounted.current) return;
           onClose();
+          setSelectedUser(null);
+          setSearchTerm("");
+          setSuccessMsg(null);
+          setErrorMsg(null);
+          setSending(false);
         }, 1500);
       } else {
-        // 🆕 MANEJO DETALLADO DE ERRORES HTTP
         const errorText = await res.text();
         console.error("❌ Error del servidor:", res.status, errorText);
 
@@ -142,7 +150,6 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
             break;
           case 401:
             errorMessage += "No autorizado - Token inválido";
-            // 🆕 LIMPIAR TOKEN SI ES INVÁLIDO
             localStorage.removeItem("Token");
             break;
           case 404:
@@ -160,18 +167,19 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     } catch (err) {
       console.error("❌ Error en actualización:", err);
 
+      if (!isMounted.current) return;
+
       if (err instanceof Error) {
         setErrorMsg(err.message);
       } else {
         setErrorMsg("Error de conexión. Verifica tu internet.");
       }
-    } finally {
       setSending(false);
     }
   };
 
-  // 🆕 FUNCIÓN PARA LIMPIAR TODO
   const handleLimpiar = () => {
+    if (!isMounted.current) return;
     setSelectedUser(null);
     setSearchTerm("");
     setUpdateName(false);
@@ -194,7 +202,6 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
         className="card-body d-flex flex-column"
         style={{ flex: 1, overflow: "hidden" }}
       >
-        {/* Contenido scrollable */}
         <div style={{ flex: 1, overflowY: "auto" }}>
           {/* Header */}
           <div className="d-flex justify-content-between align-items-center mb-3">
@@ -222,13 +229,10 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
-                if (e.target.value === "") {
-                  handleLimpiar();
-                }
+                if (e.target.value === "") handleLimpiar();
               }}
               disabled={sending}
             />
-            {/* 🆕 BOTÓN LIMPIAR */}
             {selectedUser && (
               <button
                 type="button"
@@ -241,14 +245,12 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
             )}
           </div>
 
-          {/* 🆕 MENSAJE DE ÉXITO */}
+          {/* Mensajes */}
           {successMsg && (
             <div className="alert alert-success mt-2" role="alert">
               {successMsg}
             </div>
           )}
-
-          {/* Mensajes de error */}
           {errorMsg && (
             <div className="alert alert-danger mt-2" role="alert">
               {errorMsg}
@@ -352,7 +354,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
           )}
         </div>
 
-        {/* Botón fijo abajo */}
+        {/* Botones fijos abajo */}
         <div className="d-flex justify-content-center gap-2 mt-3">
           <button
             type="button"

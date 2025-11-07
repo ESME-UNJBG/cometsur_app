@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import BotonExportarExcel from "./BotonExportarExcel";
+import BotonAnalisis from "./botonAnalisis";
 import { User } from "../interfaces/user";
 
 const TablaUsuarios: React.FC = () => {
@@ -27,12 +28,17 @@ const TablaUsuarios: React.FC = () => {
       if (!response.ok) throw new Error("Error en la petición");
 
       const data: User[] = await response.json();
-
-      // Ordenar por nombre
       data.sort((a, b) => a.name.localeCompare(b.name));
 
-      setUsuarios(data);
-      localStorage.setItem("usuarios", JSON.stringify(data));
+      // Normalizar usuarios para el modal sin afectar otros componentes
+      const normalized = data.map((u) => ({
+        ...u, // conserva _id y cualquier otro campo
+        id: u._id, // alias para el modal
+        asistencia: u.asistencia ?? null,
+      }));
+
+      setUsuarios(normalized);
+      localStorage.setItem("usuarios", JSON.stringify(normalized));
     } catch (error) {
       console.error("❌ Error actualizando usuarios:", error);
     } finally {
@@ -51,8 +57,11 @@ const TablaUsuarios: React.FC = () => {
       <div className="card-body">
         <div className="d-flex justify-content-between align-items-center mb-3">
           <h5 className="m-0 fw-bold">Lista de asistentes</h5>
-          {/* ✅ Ahora el botón recibe los usuarios desde aquí */}
-          <BotonExportarExcel usuarios={usuarios} />
+
+          <div className="d-flex gap-2">
+            <BotonAnalisis usuarios={usuarios} />
+            <BotonExportarExcel usuarios={usuarios} />
+          </div>
         </div>
 
         <div className="table-responsive">

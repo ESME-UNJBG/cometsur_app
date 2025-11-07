@@ -49,6 +49,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
   );
 
   const handleSelectUser = (user: Usuario) => {
+    console.log("Usuario seleccionado:", user.id, user.name);
     setSearchTerm(user.name);
     setSelectedId(user.id);
     setErrorMsg(null);
