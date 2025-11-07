@@ -1,100 +1,147 @@
-// hooks/useLogin.tsx
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { LoginData, LoginResponse, ApiErrorResponse } from "../interfaces/auth";
+import { useState, useCallback } from "react";
+
+export interface LoginData {
+  email: string;
+  password: string;
+}
+
+export interface User {
+  _id: string;
+  email: string;
+  name: string;
+  estado: string;
+  asistencia: number;
+  university: string;
+  importe: string;
+  category: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  user: User;
+}
+
+export interface ApiErrorResponse {
+  message: string;
+}
 
 interface UseLoginReturn {
-  login: (data: LoginData) => Promise<void>;
+  login: (data: LoginData) => Promise<boolean>;
   loading: boolean;
   error: string | null;
+  resetError: () => void;
 }
+
+const LOCAL_STORAGE_KEYS = {
+  TOKEN: "Token",
+  USER_ID: "userId",
+  USER_ROLE: "userRole",
+  USER_NAME: "userName",
+  USER_EMAIL: "userEmail",
+  USER_ASISTENCIA: "userAsistencia",
+  USER_UNIVERSITY: "userUniversity",
+  USER_IMPORTE: "userImporte",
+  USER_CATEGORY: "userCategory",
+} as const;
+
+const API_URL = "https://cometsur-api.onrender.com";
 
 const useLogin = (): UseLoginReturn => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
 
-  const API_URL = "https://cometsur-api.onrender.com";
+  const resetError = useCallback(() => setError(null), []);
 
-  const login = async (loginData: LoginData): Promise<void> => {
+  const saveUserData = useCallback((data: LoginResponse) => {
+    try {
+      const { token, user } = data;
+
+      console.log("🔐 Guardando datos en localStorage:", user);
+
+      localStorage.setItem(LOCAL_STORAGE_KEYS.TOKEN, token);
+      localStorage.setItem(LOCAL_STORAGE_KEYS.USER_ID, user._id);
+      localStorage.setItem(LOCAL_STORAGE_KEYS.USER_ROLE, user.estado);
+      localStorage.setItem(LOCAL_STORAGE_KEYS.USER_NAME, user.name);
+      localStorage.setItem(LOCAL_STORAGE_KEYS.USER_EMAIL, user.email);
+      localStorage.setItem(
+        LOCAL_STORAGE_KEYS.USER_ASISTENCIA,
+        user.asistencia.toString()
+      );
+      localStorage.setItem(LOCAL_STORAGE_KEYS.USER_UNIVERSITY, user.university);
+      localStorage.setItem(LOCAL_STORAGE_KEYS.USER_IMPORTE, user.importe);
+      localStorage.setItem(LOCAL_STORAGE_KEYS.USER_CATEGORY, user.category);
+
+      console.log("✅ Datos guardados en localStorage correctamente");
+
+      // Disparar evento personalizado para notificar a toda la app
+      window.dispatchEvent(new Event("localStorageUpdated"));
+      window.dispatchEvent(new Event("storage"));
+    } catch (storageError) {
+      console.error("❌ Error al guardar en localStorage:", storageError);
+      throw new Error("Error al guardar la sesión");
+    }
+  }, []);
+
+  const login = async (loginData: LoginData): Promise<boolean> => {
     setLoading(true);
     setError(null);
 
-    try {
-      console.log("📤 Enviando login...");
+    console.log("🚀 Iniciando proceso de login con:", loginData.email);
 
+    try {
       const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
         },
         body: JSON.stringify(loginData),
       });
 
+      console.log(
+        "📡 Respuesta del servidor:",
+        response.status,
+        response.statusText
+      );
+
       if (!response.ok) {
-        let errorMessage = "Error en el login";
+        let errorMessage = "Error en el inicio de sesión";
+
         try {
           const errorData: ApiErrorResponse = await response.json();
-          errorMessage = errorData.message || errorData.error || errorMessage;
+          errorMessage = errorData.message || errorMessage;
         } catch {
-          errorMessage = `Error ${response.status}: ${response.statusText}`;
+          errorMessage = response.statusText || errorMessage;
         }
+
+        console.error("❌ Error en login:", errorMessage);
         throw new Error(errorMessage);
       }
 
       const data: LoginResponse = await response.json();
+      console.log("✅ Login exitoso, datos recibidos:", data);
 
-      if (data.token && data.user) {
-        const essentialData = {
-          Token: data.token,
-          userId: data.user._id,
-          userName: data.user.name,
-          userRole: data.user.estado,
-          UserAsistencia: data.user.asistencia?.toString() || "0",
-        };
-
-        // 🔄 Guardar datos esenciales
-        Object.entries(essentialData).forEach(([key, value]) => {
-          localStorage.setItem(key, value);
-        });
-
-        console.log("✅ Login exitoso, datos guardados:", {
-          name: data.user.name,
-          role: data.user.estado,
-        });
-
-        // 🔄 Disparar evento storage para sincronizar inmediatamente
-        window.dispatchEvent(new Event("storage"));
-
-        // 🧭 Redirigir después de una pequeña pausa para asegurar la sincronización
-        setTimeout(() => {
-          if (data.user.estado === "usuario") {
-            navigate("/home");
-          } else if (data.user.estado === "moderador") {
-            navigate("/moderador");
-          } else {
-            console.warn("Rol no reconocido:", data.user.estado);
-            setError("Rol no reconocido, contacte al administrador");
-          }
-        }, 200); // Pequeña pausa para sincronización
-      } else {
-        throw new Error("Respuesta del servidor incompleta");
+      if (!data.token || !data.user) {
+        throw new Error("Respuesta del servidor inválida");
       }
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else if (typeof err === "string") {
-        setError(err);
-      } else {
-        setError("Error desconocido al iniciar sesión");
-      }
-      console.error("❌ Error en login:", err);
+
+      saveUserData(data);
+      console.log("🎉 Proceso de login completado exitosamente");
+      return true;
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Error desconocido al iniciar sesión";
+      console.error("💥 Error completo en login:", err);
+      setError(message);
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
-  return { login, loading, error };
+  return { login, loading, error, resetError };
 };
 
 export default useLogin;

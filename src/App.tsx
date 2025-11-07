@@ -1,8 +1,7 @@
-// src/App.tsx
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import { useState, useEffect } from "react";
 import ProtectedRoute from "./private/proRuts";
-import useUserSession from "./hook/useUserSession";
-import SmartUpdateIndicator from "./Fuciones/SmartUpdateIndicator"; // ✅ Nuevo componente
+import { useUserSessionFull } from "./hook/useUserSession";
 
 import Login from "./pages/Login";
 import Home from "./pages/Home";
@@ -12,19 +11,34 @@ import QrMod from "./pages/Qr_moderador";
 import PilaMod from "./pages/Pila_moderador";
 
 const App: React.FC = () => {
-  // ✅ Hook silencioso que se inicializa automáticamente
-  useUserSession();
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const token = localStorage.getItem("Token");
+  const userId = localStorage.getItem("userId");
+
+  useUserSessionFull(token, userId);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsCheckingAuth(false), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isCheckingAuth) {
+    return (
+      <div className="d-flex justify-content-center align-items-center vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Cargando...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Router>
-      {/* ✅ Indicador inteligente global - Solo aparece con cambios */}
-      <SmartUpdateIndicator />
-
       <Routes>
-        {/* Login libre */}
+        {/* ✅ Ruta LOGIN LIBRE - siempre muestra Login */}
         <Route path="/" element={<Login />} />
 
-        {/* Usuario */}
+        {/* ✅ Rutas protegidas para Usuario */}
         <Route
           path="/home"
           element={
@@ -42,7 +56,7 @@ const App: React.FC = () => {
           }
         />
 
-        {/* Moderador */}
+        {/* ✅ Rutas protegidas para Moderador */}
         <Route
           path="/moderador"
           element={
@@ -67,6 +81,9 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+
+        {/* ✅ Ruta de fallback */}
+        <Route path="*" element={<Login />} />
       </Routes>
     </Router>
   );

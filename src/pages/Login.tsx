@@ -1,5 +1,6 @@
 // pages/Login.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import useLogin from "../hook/useLogin";
 import logo from "../Fuciones/imag/cometsur.png";
 import "../css/LoginForm.css";
@@ -11,15 +12,42 @@ const LoginForm: React.FC = () => {
   });
 
   const { login, loading, error } = useLogin();
+  const navigate = useNavigate();
+
+  // Efecto para redirigir si ya está autenticado
+  useEffect(() => {
+    const token = localStorage.getItem("Token");
+    const userRole = localStorage.getItem("userRole");
+
+    if (token && userRole) {
+      redirectByRole(userRole);
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const redirectByRole = (role: string) => {
+    if (role === "moderador") {
+      navigate("/moderador", { replace: true });
+    } else if (role === "usuario") {
+      navigate("/home", { replace: true });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await login(formData);
+    const success = await login(formData);
+
+    if (success) {
+      // Login exitoso: redirigir según el rol
+      const userRole = localStorage.getItem("userRole");
+      if (userRole) {
+        redirectByRole(userRole);
+      }
+    }
   };
 
   return (
