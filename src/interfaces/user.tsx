@@ -8,6 +8,9 @@ export interface User {
   university: string;
   importe: string;
   category: string;
+  pago: string; // ✅ Nuevo campo
+  baucher: string; // ✅ Nuevo campo
+  profesion: string; // ✅ Nuevo campo
 }
 
 export interface UserSession {
@@ -29,5 +32,5 @@ export interface UserSessionHook extends UserSession {
   updateSession: () => Promise<void>;
   isInitialized: boolean;
   changeDetection: ChangeDetection;
-  isUpdating: boolean; // ✅ Mantener por compatibilidad, pero será siempre false
+  isUpdating: boolean; // ✅ Mantener por compatibilidad
 }

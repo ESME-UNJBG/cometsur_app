@@ -21,6 +21,15 @@ interface RegisterResponse {
   error?: string;
 }
 
+interface User {
+  _id: string;
+  email: string;
+  baucher: string;
+  name: string;
+  university: string;
+  // otras propiedades según tu API
+}
+
 const RegisterForm: React.FC<RegisterFormProps> = ({
   onClose,
   onUsuarioRegistrado,
@@ -30,13 +39,20 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     name: "",
     email: "",
     password: "",
-    university: "", // ✅ Nuevo campo
-    importe: "", // ✅ Nuevo campo
-    category: "", // ✅ Nuevo campo
+    university: "",
+    importe: "",
+    category: "",
+    pago: "",
+    profesion: "",
+    baucher: "",
   });
+
   const [validated, setValidated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [errorField, setErrorField] = useState<"email" | "baucher" | null>(
+    null
+  );
   const [emailType, setEmailType] = useState<"original" | "temporal">(
     "original"
   );
@@ -63,22 +79,22 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     "unjbg.edu.pe",
   ];
 
-  // ✅ Opciones predefinidas para Universidad
-  const universityOptions = [
+  const UNIVERSITY_OPTIONS = [
     "UNJBG - Universidad Nacional Jorge Basadre Grohmann",
     "UNSAAC - Universidad Nacional de San Antonio Abad del Cuzco",
     "UPT - Universidad Privada de Tacna",
     "OTRA - Otra universidad",
   ];
 
-  // ✅ Opciones predefinidas para Categoría
-  const categoryOptions = [
+  const CATEGORY_OPTIONS = [
     "Estudiante",
     "Egresado",
     "Docente",
     "Profesional",
-    "externo",
+    "Externo",
   ];
+  const PAGO_OPTIONS = ["Yape", "Físico", "Otro"];
+  const PROFESION_OPTIONS = ["ESMI", "ESME", "Otro"];
 
   const palabrasMinusculas = [
     "de",
@@ -112,28 +128,23 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const capitalizeWords = (text: string): string => {
     if (!text) return text;
     const words = text.toLowerCase().split(" ");
-
-    const processedWords = words.map((word, index) => {
-      if (index === 0) {
+    return words
+      .map((word, index) => {
+        if (index === 0) return word.charAt(0).toUpperCase() + word.slice(1);
+        if (palabrasMinusculas.includes(word)) return word;
+        if (word.includes("-")) {
+          return word
+            .split("-")
+            .map((part) =>
+              palabrasMinusculas.includes(part)
+                ? part
+                : part.charAt(0).toUpperCase() + part.slice(1)
+            )
+            .join("-");
+        }
         return word.charAt(0).toUpperCase() + word.slice(1);
-      }
-      if (palabrasMinusculas.includes(word)) {
-        return word;
-      }
-      if (word.includes("-")) {
-        const parts = word.split("-");
-        const processedParts = parts.map((part) => {
-          if (palabrasMinusculas.includes(part)) {
-            return part;
-          }
-          return part.charAt(0).toUpperCase() + part.slice(1);
-        });
-        return processedParts.join("-");
-      }
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    });
-
-    return processedWords.join(" ");
+      })
+      .join(" ");
   };
 
   const resetForm = () => {
@@ -141,21 +152,21 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       name: "",
       email: "",
       password: "",
-      university: "", // ✅ Resetear nuevos campos
+      university: "",
       importe: "",
       category: "",
+      pago: "",
+      profesion: "",
+      baucher: "",
     });
     setValidated(false);
     setLoading(false);
     setErrorMsg(null);
+    setErrorField(null);
     setEmailType("original");
     setShowSuggestions(false);
     setShowPassword(false);
   };
-
-  useEffect(() => {
-    resetForm();
-  }, []);
 
   useEffect(() => {
     if (show) resetForm();
@@ -166,27 +177,30 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   ) => {
     const { name, value } = e.target;
 
-    if (name === "name") {
-      setFormData((prev) => ({ ...prev, [name]: capitalizeWords(value) }));
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+    // Limpiar errores cuando el usuario modifica el campo
+    if (
+      (name === "email" && errorField === "email") ||
+      (name === "baucher" && errorField === "baucher")
+    ) {
+      setErrorField(null);
+      setErrorMsg(null);
     }
 
-    // 🔹 Sugerencias tanto para Válido como para Temporal
-    if (name === "email") {
-      if (value.includes("@")) {
-        const afterAt = value.split("@")[1] || "";
-        const domainList =
-          emailType === "temporal" ? temporalDomains : validDomains;
-        const filtered = domainList.filter((domain) =>
-          domain.startsWith(afterAt)
-        );
+    if (name === "name")
+      setFormData((prev) => ({ ...prev, name: capitalizeWords(value) }));
+    else if (name === "baucher")
+      setFormData((prev) => ({ ...prev, baucher: value.toUpperCase() }));
+    else if (name === "email") {
+      const lower = value.toLowerCase();
+      setFormData((prev) => ({ ...prev, email: lower }));
+      if (lower.includes("@")) {
+        const afterAt = lower.split("@")[1] || "";
+        const list = emailType === "temporal" ? temporalDomains : validDomains;
+        const filtered = list.filter((d) => d.startsWith(afterAt));
         setFilteredDomains(filtered);
         setShowSuggestions(filtered.length > 0);
-      } else {
-        setShowSuggestions(false);
-      }
-    }
+      } else setShowSuggestions(false);
+    } else setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleEmailTypeChange = (value: "original" | "temporal") => {
@@ -204,58 +218,129 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     const chars =
       "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     let password = "";
-    const len = 8;
-    for (let i = 0; i < len; i++) {
+    for (let i = 0; i < 8; i++)
       password += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
     setFormData((prev) => ({ ...prev, password }));
+  };
+
+  const checkDuplicates = async (): Promise<{
+    emailDuplicado: boolean;
+    baucherDuplicado: boolean;
+  }> => {
+    const token = localStorage.getItem("Token");
+    if (!token) {
+      console.error("❌ Falta el token en localStorage");
+      return { emailDuplicado: false, baucherDuplicado: false };
+    }
+
+    try {
+      const response = await fetch(`https://cometsur-api.onrender.com/users/`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      const users: User[] = await response.json();
+
+      // Verificar si existe el email o baucher
+      const emailDuplicado = users.some(
+        (user) => user.email.toLowerCase() === formData.email.toLowerCase()
+      );
+
+      const baucherDuplicado = users.some(
+        (user) => user.baucher.toUpperCase() === formData.baucher.toUpperCase()
+      );
+
+      return { emailDuplicado, baucherDuplicado };
+    } catch (error) {
+      console.error("Error checking duplicates:", error);
+      return { emailDuplicado: false, baucherDuplicado: false };
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = e.currentTarget;
+    setValidated(true);
 
+    // Validación básica del formulario
+    const form = e.currentTarget;
     if (!form.checkValidity()) {
       e.stopPropagation();
-      setValidated(true);
       return;
     }
 
     setLoading(true);
-    setValidated(true);
     setErrorMsg(null);
+    setErrorField(null);
+
+    // Verificar duplicados
+    const { emailDuplicado, baucherDuplicado } = await checkDuplicates();
+
+    if (emailDuplicado || baucherDuplicado) {
+      if (emailDuplicado) {
+        setErrorField("email");
+        setErrorMsg("El email ya fue registrado.");
+      } else {
+        setErrorField("baucher");
+        setErrorMsg("El baucher ya fue registrado.");
+      }
+      setLoading(false);
+      return; // Modal permanece abierto
+    }
 
     try {
-      // ✅ Preparar datos para enviar (convertir importe a número)
-      const dataToSend = {
-        ...formData,
-        importe: parseInt(formData.importe) || 0, // Convertir a número
-      };
-
       const response: AxiosResponse<RegisterResponse> = await axios.post(
         "https://cometsur-api.onrender.com/auth/register",
-        dataToSend,
+        formData,
         { headers: { "Content-Type": "application/json" } }
       );
-
       const usuarioId =
         response.data._id || response.data.id || response.data.user?._id;
-
-      if (usuarioId && onUsuarioRegistrado) {
-        onUsuarioRegistrado(usuarioId);
+      if (usuarioId) {
+        if (onUsuarioRegistrado) onUsuarioRegistrado(usuarioId);
+        resetForm();
+        onClose();
       }
-
-      resetForm();
-    } catch (err: unknown) {
+    } catch (err) {
       let mensaje = "Error en la petición";
       if (axios.isAxiosError(err)) {
-        mensaje = err.response?.data?.error || err.response?.data || mensaje;
+        const data = err.response?.data as {
+          code?: number;
+          keyPattern?: { email?: number; baucher?: number };
+          error?: string;
+        };
+        if (data?.code === 11000) {
+          if (data.keyPattern?.email) {
+            mensaje = "El email ya fue registrado.";
+            setErrorField("email");
+          } else if (data.keyPattern?.baucher) {
+            mensaje = "El baucher ya fue registrado.";
+            setErrorField("baucher");
+          }
+        } else {
+          mensaje = data?.error || mensaje;
+        }
       }
       setErrorMsg(mensaje);
     } finally {
       setLoading(false);
-      if (!errorMsg) onClose();
     }
+  };
+
+  // Función para determinar clases de los campos
+  const getFieldClassName = (fieldName: "email" | "baucher"): string => {
+    const baseClass = "form-control";
+    // Si hay error en este campo, aplicar clase personalizada
+    if (errorField === fieldName) {
+      return `${baseClass} field-with-error`;
+    }
+    return baseClass;
   };
 
   return (
@@ -276,12 +361,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           noValidate
           onSubmit={handleSubmit}
         >
-          {errorMsg && (
-            <div className="alert alert-danger" role="alert">
-              {errorMsg}
-            </div>
+          {/* Mensaje general */}
+          {errorMsg && !errorField && (
+            <div className="alert alert-danger">{errorMsg}</div>
           )}
 
+          {/* Nombre */}
           <div className="col-md-12 mb-3">
             <label className="form-label">Nombre y apellido:</label>
             <input
@@ -292,59 +377,62 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               onChange={handleChange}
               required
               disabled={loading}
-              autoComplete="name"
               placeholder="Ej: Juan Pérez de la Garza"
             />
+            <div className="invalid-feedback">
+              Por favor ingresa tu nombre y apellido.
+            </div>
           </div>
 
+          {/* Email */}
           <div className="col-md-12 mb-3 position-relative">
             <label className="form-label">Email:</label>
             <input
               type="email"
-              className="form-control"
+              className={getFieldClassName("email")}
               name="email"
               placeholder="example@email"
               value={formData.email}
               onChange={handleChange}
               required
               disabled={loading}
-              autoComplete="email"
             />
+            {errorField === "email" && (
+              <div className="error-feedback">{errorMsg}</div>
+            )}
+            <div className="invalid-feedback">
+              Por favor ingresa un email válido.
+            </div>
 
+            {/* Tipo de email */}
             <div className="d-flex align-items-center gap-3 mt-2">
               <div className="form-check form-check-inline">
                 <input
                   className="form-check-input"
                   type="radio"
                   name="emailType"
-                  id="emailTypeOriginal"
                   value="original"
                   checked={emailType === "original"}
                   onChange={() => handleEmailTypeChange("original")}
                   disabled={loading}
                 />
-                <label className="form-check-label" htmlFor="emailTypeOriginal">
-                  Válido
-                </label>
+                <label className="form-check-label">Válido</label>
               </div>
-
               <div className="form-check form-check-inline">
                 <input
                   className="form-check-input"
                   type="radio"
                   name="emailType"
-                  id="emailTypeTemporal"
                   value="temporal"
                   checked={emailType === "temporal"}
                   onChange={() => handleEmailTypeChange("temporal")}
                   disabled={loading}
                 />
-                <label className="form-check-label" htmlFor="emailTypeTemporal">
-                  Temporal
-                </label>
+                <label className="form-check-label">Temporal</label>
               </div>
             </div>
 
+            {/* Sugerencias */}
             {showSuggestions && filteredDomains.length > 0 && (
               <ul
                 className="list-group position-absolute w-100 mt-1 shadow"
@@ -364,7 +452,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             )}
           </div>
 
-          {/* ✅ NUEVA FILA CON LOS TRES CAMPOS - AMBOS CON SELECT */}
+          {/* Universidad, Importe, Categoría */}
           <div className="row mb-3">
             <div className="col-md-4">
               <label className="form-label">Universidad:</label>
@@ -377,14 +465,16 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 disabled={loading}
               >
                 <option value="">Selecc. universidad</option>
-                {universityOptions.map((university) => (
-                  <option key={university} value={university}>
-                    {university}
+                {UNIVERSITY_OPTIONS.map((u) => (
+                  <option key={u} value={u}>
+                    {u}
                   </option>
                 ))}
               </select>
+              <div className="invalid-feedback">
+                Por favor selecciona una universidad.
+              </div>
             </div>
-
             <div className="col-md-4">
               <label className="form-label">Importe:</label>
               <input
@@ -395,13 +485,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 onChange={handleChange}
                 required
                 disabled={loading}
-                autoComplete="importe"
                 placeholder="Ej: 30"
                 min="0"
-                step="1"
               />
+              <div className="invalid-feedback">
+                Por favor ingresa el importe.
+              </div>
             </div>
-
             <div className="col-md-4">
               <label className="form-label">Categoría:</label>
               <select
@@ -413,15 +503,85 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 disabled={loading}
               >
                 <option value="">Selecc. categoría</option>
-                {categoryOptions.map((category) => (
-                  <option key={category} value={category}>
-                    {category.charAt(0).toUpperCase() + category.slice(1)}
+                {CATEGORY_OPTIONS.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
                   </option>
                 ))}
               </select>
+              <div className="invalid-feedback">
+                Por favor selecciona una categoría.
+              </div>
             </div>
           </div>
 
+          {/* Pago, Profesión, Baucher */}
+          <div className="row mb-3">
+            <div className="col-md-4">
+              <label className="form-label">Pago:</label>
+              <select
+                className="form-select"
+                name="pago"
+                value={formData.pago}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              >
+                <option value="">Seleccione método</option>
+                {PAGO_OPTIONS.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+              <div className="invalid-feedback">
+                Por favor selecciona un método de pago.
+              </div>
+            </div>
+            <div className="col-md-4">
+              <label className="form-label">Profesión:</label>
+              <select
+                className="form-select"
+                name="profesion"
+                value={formData.profesion}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              >
+                <option value="">Seleccione profesión</option>
+                {PROFESION_OPTIONS.map((p) => (
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
+                ))}
+              </select>
+              <div className="invalid-feedback">
+                Por favor selecciona una profesión.
+              </div>
+            </div>
+            <div className="col-md-4">
+              <label className="form-label">Baucher:</label>
+              <input
+                type="text"
+                className={getFieldClassName("baucher")}
+                name="baucher"
+                value={formData.baucher}
+                onChange={handleChange}
+                placeholder="Ej: A1"
+                required
+                disabled={loading}
+                autoComplete="off"
+              />
+              {errorField === "baucher" && (
+                <div className="error-feedback">{errorMsg}</div>
+              )}
+              <div className="invalid-feedback">
+                Por favor ingresa el número de baucher.
+              </div>
+            </div>
+          </div>
+
+          {/* Contraseña */}
           <div className="col-md-12 mb-3">
             <label className="form-label">Contraseña:</label>
             <div className="input-group">
@@ -429,7 +589,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 type={showPassword ? "text" : "password"}
                 className="form-control"
                 name="password"
-                placeholder="Carácter (6-16)"
                 value={formData.password}
                 onChange={handleChange}
                 required
@@ -437,30 +596,31 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 maxLength={16}
                 disabled={loading}
                 autoComplete="new-password"
+                placeholder="Carácter (6-16)"
               />
-
               <button
                 type="button"
                 className="btn btn-outline-secondary"
                 onClick={() => setShowPassword(!showPassword)}
                 disabled={loading}
-                title={showPassword ? "Ocultar" : "Mostrar"}
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
-
               <button
                 type="button"
                 className="btn btn-outline-primary"
                 onClick={generatePassword}
                 disabled={loading}
-                title="Generar contraseña"
               >
                 Generar 🔄
               </button>
             </div>
+            <div className="invalid-feedback">
+              La contraseña debe tener entre 6 y 16 caracteres.
+            </div>
           </div>
 
+          {/* Botón enviar */}
           <div className="mb-3">
             <button
               type="submit"

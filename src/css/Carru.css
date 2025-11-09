@@ -1,0 +1,76 @@
+/* ===== Estilo principal del carrusel ===== */
+.mi-carrusel-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  margin: 0 auto;
+  width: 90%;
+}
+
+/* Carrusel: imagen con animación suave */
+.mi-carrusel {
+  width: 90%;
+  height: 350px;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  transition: all 0.8s ease-in-out;
+}
+
+.mi-carrusel-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 1rem;
+  transition: opacity 1s ease-in-out;
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* ===== Indicadores inferiores ===== */
+.mi-carrusel-indicadores {
+  display: flex;
+  gap: 0.8rem;
+  justify-content: center;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.indicador {
+  width: 12px;
+  height: 12px;
+  background-color: #bbb;
+  border-radius: 50%;
+  transition: all 0.4s ease-in-out;
+  cursor: pointer;
+}
+
+.indicador:hover {
+  background-color: #888;
+}
+
+.indicador.activo {
+  background-color: #0d6efd; /* Azul Bootstrap */
+  transform: scale(1.4);
+  box-shadow: 0 0 10px rgba(13, 110, 253, 0.6);
+}
+
+/* ===== Animación de aparición ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===== Responsividad ===== */
+@media (min-width: 992px) {
+  .mi-carrusel {
+    width: 50%;
+    height: 350px;
+  }
+}

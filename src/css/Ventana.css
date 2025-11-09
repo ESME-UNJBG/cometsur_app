@@ -1,6 +1,4 @@
 /* ===== Estilos de la ventana modal ===== */
-
-/* Fondo oscuro + centrado */
 .ventana-overlay {
   position: fixed;
   top: 0;
@@ -14,29 +12,26 @@
   z-index: 1050;
 }
 
-/* Contenido del modal (controla tamaño y centrado responsivo) */
 .ventana-content {
-  background: #fff; /* 👈 fondo blanco para el card */
+  background: #fff;
   border-radius: 10px;
   padding: 0rem;
-  width: 55%; /* PC */
+  width: 55%;
   max-height: 90vh;
-  overflow-y: auto; /* scroll si el form es largo */
+  overflow-y: auto;
 }
 
-/* 📱 En pantallas pequeñas */
 @media (max-width: 900px) {
   .ventana-content {
-    width: 80%; /* móvil */
+    width: 80%;
   }
 }
 
 /* ===== Estilos del formulario de registro ===== */
 .login-container {
-  width: 100%; /* ahora toma el ancho del contenedor padre */
+  width: 100%;
 }
 
-/* Logo responsivo */
 .login-logo {
   display: block;
   margin: 0 auto;
@@ -50,4 +45,26 @@
     width: 150px;
     height: 150px;
   }
+}
+
+/* ESTILOS PARA CAMPOS CON ERROR - SOBRESCRIBIR BOOTSTRAP */
+.field-with-error {
+  border-color: #dc3545 !important;
+  background-color: #fff8f8 !important;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+/* Remover estilos de validación de Bootstrap cuando hay error */
+.field-with-error.is-valid {
+  border-color: #dc3545 !important;
+  background-color: #fff8f8 !important;
+}
+
+/* Mensaje de error personalizado */
+.error-feedback {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+  width: 100%;
 }

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "../css/collapse.css"; // 👈 archivo de estilos personalizado
 
 type ItemProps = {
   title: string;
@@ -9,19 +10,20 @@ const AccordionItem: React.FC<ItemProps> = ({ title, children }) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="accordion-item" style={{ fontSize: "13px" }}>
+    <div className="accordion-item custom-accordion-item">
       <h2 className="accordion-header">
         <button
-          className={`accordion-button ${open ? "" : "collapsed"}`}
+          className={`accordion-button custom-accordion-button ${
+            open ? "" : "collapsed"
+          }`}
           type="button"
           onClick={() => setOpen(!open)}
-          style={{ fontSize: "12px" }}
         >
           {title}
         </button>
       </h2>
       <div className={`accordion-collapse collapse ${open ? "show" : ""}`}>
-        <div className="accordion-body">{children}</div>
+        <div className="accordion-body custom-accordion-body">{children}</div>
       </div>
     </div>
   );
@@ -29,13 +31,13 @@ const AccordionItem: React.FC<ItemProps> = ({ title, children }) => {
 
 const Collapse: React.FC = () => {
   return (
-    <div className="container my-4">
-      <div className="row g-1 justify-content-center">
+    <div className="container my-5">
+      <div className="row g-4 justify-content-center">
         {/* MISION */}
         <div className="col-12 col-md-6">
           <div className="accordion" id="accordionMission">
             <AccordionItem title="MISIÓN">
-              <strong>Nuestra mision:</strong> El Segundo Congreso Metalúrgico
+              <strong>Nuestra misión:</strong> El Segundo Congreso Metalúrgico
               del Sur nace con el compromiso de ser un punto de encuentro para
               los profesionales, investigadores, egresados y estudiantes que
               impulsan el desarrollo de la metalurgia, minería y gestión
@@ -56,7 +58,7 @@ const Collapse: React.FC = () => {
         <div className="col-12 col-md-6">
           <div className="accordion" id="accordionVision">
             <AccordionItem title="VISIÓN">
-              <strong>Nuestra vision:</strong> Visualizamos al II COMETSUR como
+              <strong>Nuestra visión:</strong> Visualizamos al II COMETSUR como
               el congreso metalúrgico líder en el sur del Perú, reconocido
               nacional e internacionalmente por su excelencia, innovación y
               compromiso con el desarrollo sostenible. Queremos ser un referente

@@ -1,10 +1,12 @@
-import imag from "../Fuciones/imag/sepa1.png";
-import "../css/separa.css"; // 👈 crea este archivo
+import "../css/separa.css";
 
 const Imagen = () => {
   return (
     <div className="separa-container">
-      <img src={imag} alt="Imagen 1" className="responsive-img" />
+      <h2 className="separa-titulo">
+        ESCUELA PROFESIONAL DE INGENIERÍA METALÚRGICA Y MATERIALES
+      </h2>
+      <div className="separa-linea"></div>
     </div>
   );
 };

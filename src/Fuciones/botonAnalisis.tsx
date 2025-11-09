@@ -14,6 +14,8 @@ const COLORS = [
   "#FF8042",
   "#A020F0",
   "#FF6384",
+  "#36A2EB",
+  "#4BC0C0",
 ];
 
 const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
@@ -25,8 +27,32 @@ const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
     [usuarios]
   );
 
+  // Ingreso Yape
+  const ingresoYape = useMemo(
+    () =>
+      usuarios
+        .filter((u) => u.pago === "Yape")
+        .reduce((sum, u) => sum + (parseFloat(u.importe) || 0), 0),
+    [usuarios]
+  );
+
+  // Ingreso Físico
+  const ingresoFisico = useMemo(
+    () =>
+      usuarios
+        .filter((u) => u.pago === "Físico")
+        .reduce((sum, u) => sum + (parseFloat(u.importe) || 0), 0),
+    [usuarios]
+  );
+
+  // Contador de Otros
+  const contadorOtros = useMemo(
+    () => usuarios.filter((u) => u.pago === "Otro").length,
+    [usuarios]
+  );
+
   // Datos por categoría
-  const dataCategorias: { name: string; value: number }[] = useMemo(() => {
+  const dataCategorias = useMemo(() => {
     const conteo: Record<string, number> = {};
     usuarios.forEach((u) => {
       conteo[u.category] = (conteo[u.category] || 0) + 1;
@@ -35,10 +61,19 @@ const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
   }, [usuarios]);
 
   // Datos por universidad
-  const dataUniversidades: { name: string; value: number }[] = useMemo(() => {
+  const dataUniversidades = useMemo(() => {
     const conteo: Record<string, number> = {};
     usuarios.forEach((u) => {
       conteo[u.university] = (conteo[u.university] || 0) + 1;
+    });
+    return Object.entries(conteo).map(([name, value]) => ({ name, value }));
+  }, [usuarios]);
+
+  // Datos por profesión
+  const dataProfesiones = useMemo(() => {
+    const conteo: Record<string, number> = {};
+    usuarios.forEach((u) => {
+      conteo[u.profesion] = (conteo[u.profesion] || 0) + 1;
     });
     return Object.entries(conteo).map(([name, value]) => ({ name, value }));
   }, [usuarios]);
@@ -49,6 +84,7 @@ const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
     (sum, d) => sum + d.value,
     0
   );
+  const totalProfesiones = dataProfesiones.reduce((sum, d) => sum + d.value, 0);
 
   const dataCategoriasWithTotal = dataCategorias.map((d) => ({
     ...d,
@@ -57,6 +93,10 @@ const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
   const dataUniversidadesWithTotal = dataUniversidades.map((d) => ({
     ...d,
     total: totalUniversidades,
+  }));
+  const dataProfesionesWithTotal = dataProfesiones.map((d) => ({
+    ...d,
+    total: totalProfesiones,
   }));
 
   // Tooltip personalizado
@@ -125,9 +165,10 @@ const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
 
               <div className="modal-body">
                 <div className="row text-center">
-                  {/* Total Importe */}
-                  <div className="col-md-4 mb-3">
-                    <div className="card shadow-sm p-3">
+                  {/* Columna 1: Total Importe y Desglose de Pagos (ESCALONADO) */}
+                  <div className="col-md-3 mb-3">
+                    {/* Total Importe */}
+                    <div className="card shadow-sm p-3 mb-2">
                       <h6 className="fw-bold text-secondary">Total Importe</h6>
                       <h4
                         className="text-success fw-bold"
@@ -136,10 +177,103 @@ const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
                         S/ {totalImporte.toFixed(2)}
                       </h4>
                     </div>
+
+                    {/* Ingreso Yape */}
+                    <div className="card shadow-sm p-2 mb-2">
+                      <h6 className="fw-bold text-secondary">Ingreso Yape</h6>
+                      <h5
+                        className="text-primary fw-bold"
+                        style={{ fontSize: "1.1rem" }}
+                      >
+                        S/ {ingresoYape.toFixed(2)}
+                      </h5>
+                      <small className="text-muted">
+                        {usuarios.filter((u) => u.pago === "Yape").length}{" "}
+                        transacciones
+                      </small>
+                    </div>
+
+                    {/* Ingreso Físico */}
+                    <div className="card shadow-sm p-2 mb-2">
+                      <h6 className="fw-bold text-secondary">Ingreso Físico</h6>
+                      <h5
+                        className="text-warning fw-bold"
+                        style={{ fontSize: "1.1rem" }}
+                      >
+                        S/ {ingresoFisico.toFixed(2)}
+                      </h5>
+                      <small className="text-muted">
+                        {usuarios.filter((u) => u.pago === "Físico").length}{" "}
+                        transacciones
+                      </small>
+                    </div>
+
+                    {/* Ingreso Otros */}
+                    <div className="card shadow-sm p-2">
+                      <h6 className="fw-bold text-secondary">Ingreso Otros</h6>
+                      <h5
+                        className="text-info fw-bold"
+                        style={{ fontSize: "1.1rem" }}
+                      >
+                        {contadorOtros}
+                      </h5>
+                      <small className="text-muted">
+                        registros con método "Otro"
+                      </small>
+                    </div>
                   </div>
 
-                  {/* Por Categoría */}
-                  <div className="col-md-4 mb-3">
+                  {/* Columna 2: Por Profesión */}
+                  <div className="col-md-3 mb-3">
+                    <div className="card shadow-sm p-2">
+                      <h6 className="fw-bold text-secondary">Por Profesión</h6>
+                      <ResponsiveContainer width="100%" height={180}>
+                        <PieChart>
+                          <Pie
+                            data={dataProfesionesWithTotal}
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={60}
+                            dataKey="value"
+                          >
+                            {dataProfesionesWithTotal.map((_, index) => (
+                              <Cell
+                                key={`prof-${index}`}
+                                fill={COLORS[index % COLORS.length]}
+                              />
+                            ))}
+                          </Pie>
+                          <Tooltip content={<CustomTooltip />} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <div className="mt-2 d-flex flex-wrap justify-content-center">
+                        {dataProfesionesWithTotal.map((d, index) => (
+                          <div
+                            key={`legend-prof-${index}`}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              marginRight: 10,
+                              fontSize: 12,
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: 12,
+                                height: 12,
+                                backgroundColor: COLORS[index % COLORS.length],
+                                marginRight: 4,
+                              }}
+                            />
+                            {d.name}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Columna 3: Por Categoría */}
+                  <div className="col-md-3 mb-3">
                     <div className="card shadow-sm p-2">
                       <h6 className="fw-bold text-secondary">Por Categoría</h6>
                       <ResponsiveContainer width="100%" height={180}>
@@ -161,7 +295,6 @@ const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
                           <Tooltip content={<CustomTooltip />} />
                         </PieChart>
                       </ResponsiveContainer>
-                      {/* Leyenda debajo */}
                       <div className="mt-2 d-flex flex-wrap justify-content-center">
                         {dataCategoriasWithTotal.map((d, index) => (
                           <div
@@ -188,8 +321,8 @@ const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
                     </div>
                   </div>
 
-                  {/* Por Universidad */}
-                  <div className="col-md-4 mb-3">
+                  {/* Columna 4: Por Universidad */}
+                  <div className="col-md-3 mb-3">
                     <div className="card shadow-sm p-2">
                       <h6 className="fw-bold text-secondary">
                         Por Universidad
@@ -213,7 +346,6 @@ const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
                           <Tooltip content={<CustomTooltip />} />
                         </PieChart>
                       </ResponsiveContainer>
-                      {/* Leyenda debajo */}
                       <div className="mt-2 d-flex flex-wrap justify-content-center">
                         {dataUniversidadesWithTotal.map((d, index) => (
                           <div
