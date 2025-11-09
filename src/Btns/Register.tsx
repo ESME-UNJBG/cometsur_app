@@ -80,10 +80,14 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   ];
 
   const UNIVERSITY_OPTIONS = [
-    "UNJBG - Universidad Nacional Jorge Basadre Grohmann",
-    "UNSAAC - Universidad Nacional de San Antonio Abad del Cuzco",
-    "UPT - Universidad Privada de Tacna",
-    "OTRA - Otra universidad",
+    "UNJBG",
+    "UNSAAC",
+    "UNSA",
+    "UNI",
+    "UNMSM",
+    "UNT",
+    "UNDAC",
+    "Otra universidad",
   ];
 
   const CATEGORY_OPTIONS = [
@@ -94,7 +98,15 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     "Externo",
   ];
   const PAGO_OPTIONS = ["Yape", "Físico", "Otro"];
-  const PROFESION_OPTIONS = ["ESMI", "ESME", "Otro"];
+  const PROFESION_OPTIONS = [
+    "ESMI",
+    "ESME",
+    "ESGEO",
+    "ESIQ",
+    "ESMC",
+    "ESAM",
+    "Otro",
+  ];
 
   const palabrasMinusculas = [
     "de",
@@ -344,18 +356,17 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   };
 
   return (
-    <div className="login-container card">
-      <div className="card-body position-relative">
-        <div className="d-flex justify-content-end">
-          <button
-            type="button"
-            className="btn-close"
-            aria-label="Close"
-            onClick={onClose}
-            disabled={loading}
-          ></button>
-        </div>
-
+    <div className="login-container ventana-content">
+      <div className="ventana-header">
+        <button
+          type="button"
+          className="btn-close"
+          aria-label="Close"
+          onClick={onClose}
+          disabled={loading}
+        ></button>
+      </div>
+      <div className="ventana-body">
         <form
           className={`needs-validation ${validated ? "was-validated" : ""}`}
           noValidate

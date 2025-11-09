@@ -1,4 +1,4 @@
-/* ===== Estilos de la ventana modal ===== */
+/* ===== Overlay del modal ===== */
 .ventana-overlay {
   position: fixed;
   top: 0;
@@ -10,31 +10,135 @@
   justify-content: center;
   align-items: center;
   z-index: 1050;
+  padding: 1rem;
 }
 
+/* ===== Contenedor principal ===== */
 .ventana-content {
   background: #fff;
   border-radius: 10px;
-  padding: 0rem;
   width: 55%;
+  max-width: 900px;
   max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden; /* evita scroll doble */
+}
+
+/* Cabecera fija dentro del modal */
+.ventana-header {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #dee2e6;
+  background-color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.ventana-body {
+  padding: 1.5rem 2rem;
   overflow-y: auto;
 }
 
+/* ===== Pantallas medianas ===== */
 @media (max-width: 900px) {
   .ventana-content {
     width: 80%;
+    max-height: 95vh;
+  }
+
+  .ventana-body {
+    padding: 1.25rem;
   }
 }
 
-/* ===== Estilos del formulario de registro ===== */
+/* ===== Pantallas pequeñas ===== */
+@media (max-width: 600px) {
+  .ventana-content {
+    width: 95%;
+    height: 95vh;
+    border-radius: 8px;
+  }
+
+  .ventana-body {
+    padding: 1rem;
+  }
+
+  /* Apilar los campos con menos espacio entre ellos */
+  .row.mb-3 {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem !important;
+  }
+
+  .col-md-4 {
+    width: 100%;
+    margin-bottom: 0.25rem;
+  }
+
+  /* Radios "Válido" y "Temporal" lado a lado */
+  .d-flex.align-items-center.gap-3.mt-2 {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  /* Inputs en grupo vertical */
+  .input-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .input-group > .btn {
+    width: 100%;
+  }
+
+  label.form-label {
+    font-size: 0.9rem;
+    margin-bottom: 0.2rem;
+  }
+
+  input,
+  select,
+  button {
+    font-size: 0.9rem !important;
+  }
+
+  .btn-primary {
+    font-size: 1rem;
+    padding: 0.6rem;
+  }
+
+  /* === Ajuste de selects e inputs para evitar agrandamiento === */
+  select.form-select,
+  input.form-control {
+    font-size: 14px !important; /* Reduce tamaño del texto */
+    padding: 6px 10px !important; /* Ajusta altura */
+    border-radius: 6px; /* Bordes suaves */
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  label {
+    font-size: 13px;
+  }
+}
+
+/* ===== Estilos generales ===== */
 .login-container {
   width: 100%;
 }
 
 .login-logo {
   display: block;
-  margin: 0 auto;
+  margin: 0 auto 1rem;
   width: 120px;
   height: auto;
   object-fit: contain;
@@ -42,29 +146,60 @@
 
 @media (max-width: 768px) {
   .login-logo {
-    width: 150px;
-    height: 150px;
+    width: 100px;
+    height: auto;
   }
 }
 
-/* ESTILOS PARA CAMPOS CON ERROR - SOBRESCRIBIR BOOTSTRAP */
+/* ===== Campos con error ===== */
 .field-with-error {
   border-color: #dc3545 !important;
   background-color: #fff8f8 !important;
   box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
 }
 
-/* Remover estilos de validación de Bootstrap cuando hay error */
 .field-with-error.is-valid {
   border-color: #dc3545 !important;
   background-color: #fff8f8 !important;
 }
 
-/* Mensaje de error personalizado */
 .error-feedback {
   color: #dc3545;
   font-size: 0.875rem;
   margin-top: 0.25rem;
   display: block;
   width: 100%;
+}
+
+/* ===== Ajuste especial para campo de contraseña ===== */
+.input-group {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: nowrap;
+}
+
+/* ===== En pantallas pequeñas ===== */
+@media (max-width: 600px) {
+  .input-group {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 0.4rem;
+  }
+
+  /* El input ocupa todo el ancho */
+  .input-group input[type="password"],
+  .input-group input[type="text"] {
+    width: 100%;
+  }
+
+  /* Los botones se muestran completos y no se cortan */
+  .input-group button {
+    width: 100%;
+    min-height: 40px;
+  }
+
+  /* Alinear el ícono del ojo al centro verticalmente */
+  .input-group .btn-outline-secondary svg {
+    vertical-align: middle;
+  }
 }
