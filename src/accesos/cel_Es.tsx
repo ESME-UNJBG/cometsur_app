@@ -168,14 +168,15 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
       usuariosRef.current = nuevos;
       localStorage.setItem("usuarios", JSON.stringify(nuevos));
 
-      // ✅ Mostrar mensaje de éxito (solo una vez)
+      // ✅ Mostrar mensaje de éxito (solo 1 vez)
       setSuccessMsg(
         `✅ Asistencia ${num} guardada para ${usuarioEncontrado.name}`
       );
 
-      // 🔄 Reiniciar escáner sin cerrar ventana
-      await stopScanner();
+      // 🔄 Esperar 2 segundos y reiniciar cámara
       setTimeout(async () => {
+        setSuccessMsg(null);
+        await stopScanner();
         const container = document.getElementById(QR_REGION_ID);
         if (container) {
           try {
@@ -186,7 +187,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
             setScannerStatus("error");
           }
         }
-      }, 500);
+      }, 2000);
     } catch (err) {
       let message = "Error actualizando asistencia.";
       if (err instanceof Error) message = err.message;
