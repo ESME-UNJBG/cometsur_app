@@ -17,15 +17,15 @@ const Qrcode: React.FC = () => {
         }}
       >
         <Asistencia></Asistencia>
+        <Foro></Foro>
       </div>
       <div
         style={{
-          marginTop: "55px", // Altura de la barra superior
+          marginTop: "10px", // Altura de la barra superior
           marginBottom: "40px", // Altura de la barra inferior
         }}
       >
         <Qr></Qr>
-        <Foro></Foro>
       </div>
 
       <Foor></Foor>
