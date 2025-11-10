@@ -288,7 +288,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
               )}
             </div>
             <div className="d-flex flex-wrap justify-content-center gap-2 mt-3">
-              {[1, 2, 3, 4].map((num) => (
+              {[1, 2, 3, 4, 5, 6].map((num) => (
                 <button
                   key={num}
                   type="button"

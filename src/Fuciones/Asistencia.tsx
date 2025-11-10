@@ -1,5 +1,6 @@
 import { useUserSessionFull } from "../hook/useUserSession";
 import { useEffect, useState } from "react";
+import "../css/Asistencia.css"; // Importamos el nuevo CSS
 
 const Asistencia = () => {
   const token = localStorage.getItem("Token");
@@ -25,21 +26,27 @@ const Asistencia = () => {
 
   const progress = (localAsistencia / 6) * 100;
 
+  // Determinar clase según la asistencia
+  let progressClass = "progress-bar-gray";
+  if (localAsistencia >= 3 && localAsistencia < 6)
+    progressClass = "progress-bar-yellow";
+  else if (localAsistencia >= 6) progressClass = "progress-bar-green";
+
   return (
-    <div className="card p-3 text-center">
-      <h5>Asistencia</h5>
-      <p className="fw-bold">{localAsistencia}/6</p>
-      <div className="progress mt-2" style={{ height: "8px" }}>
+    <div className="asistencia-card">
+      <h5 className="asistencia-title">Asistencia</h5>
+      <p className="asistencia-count">{localAsistencia}/6</p>
+      <div className="asistencia-progress">
         <div
-          className="progress-bar"
-          role="progressbar"
+          className={`asistencia-progress-bar ${progressClass}`}
           style={{ width: `${progress}%` }}
+          role="progressbar"
           aria-valuenow={progress}
           aria-valuemin={0}
           aria-valuemax={100}
         />
       </div>
-      {error && <small className="text-danger mt-1">Error al actualizar</small>}
+      {error && <small className="asistencia-error">Error al actualizar</small>}
     </div>
   );
 };

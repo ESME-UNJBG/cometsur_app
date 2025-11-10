@@ -22,8 +22,8 @@ const Home: React.FC = () => {
       </div>
       <div
         style={{
-          marginTop: "10px", // Altura de la barra superior
-          marginBottom: "10px", // Altura de la barra inferior
+          marginTop: "0.5px", // Altura de la barra superior
+          marginBottom: "0.5px", // Altura de la barra inferior
           display: "flex",
         }}
       >

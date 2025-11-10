@@ -53,16 +53,16 @@
   flex-direction: column;
   flex: 1;
   padding: 1rem 1.5rem;
-  overflow: hidden; /* impide que se desplace todo el cuerpo */
+  overflow: hidden;
 }
 
-/* ===== Buscador fijo ===== */
+/* ===== Buscador ===== */
 .compu-search {
   flex-shrink: 0;
   margin-bottom: 0.75rem;
 }
 
-/* ===== Contenedor con scroll solo para la tabla ===== */
+/* ===== Tabla con scroll ===== */
 .table-scroll {
   flex: 1;
   overflow-y: auto;
@@ -71,7 +71,6 @@
   background: #fff;
 }
 
-/* ===== Encabezado fijo dentro de la tabla ===== */
 .table-scroll table {
   width: 100%;
   border-collapse: collapse;
@@ -85,7 +84,6 @@
   border-bottom: 1px solid #dee2e6;
 }
 
-/* ===== Estilo base de la tabla ===== */
 .table-scroll td,
 .table-scroll th {
   padding: 8px 12px;
@@ -103,11 +101,12 @@
   font-size: 0.9rem;
 }
 
-/* ===== Footer (botones fijos abajo) ===== */
+/* ===== Footer (botones) ===== */
 .compu-footer {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* para pantallas pequeñas */
   justify-content: center;
+  align-items: center;
   gap: 0.75rem;
   padding: 1rem;
   border-top: 1px solid #dee2e6;
@@ -115,13 +114,22 @@
   flex-shrink: 0;
 }
 
+/* ===== Botones uniformes ===== */
 .compu-footer button {
-  min-width: 120px;
-  max-width: 180px;
-  flex: 1;
+  width: 140px; /* todos los botones del mismo ancho */
+  height: 42px;
+  text-align: center;
   padding: 0.5rem 1rem;
   font-weight: 500;
   font-size: 0.95rem;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  flex: none; /* evita que se redimensionen */
+}
+
+/* Hover */
+.compu-footer button:hover {
+  transform: scale(1.05);
 }
 
 /* ===== Responsividad ===== */
@@ -133,6 +141,12 @@
 
   .compu-body {
     padding: 1rem;
+  }
+
+  .compu-footer button {
+    width: 120px;
+    height: 40px;
+    font-size: 0.9rem;
   }
 }
 
@@ -149,9 +163,15 @@
     padding: 6px 8px;
   }
 
+  .compu-footer {
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
   .compu-footer button {
-    font-size: 0.9rem;
-    min-width: 100px;
+    width: 100px;
+    height: 38px;
+    font-size: 0.85rem;
   }
 }
 
@@ -166,6 +186,7 @@
     transform: scale(1);
   }
 }
+
 /* ===== Botón de cierre (X) ===== */
 .close-button {
   background: none;

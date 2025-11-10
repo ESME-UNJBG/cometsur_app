@@ -1,0 +1,81 @@
+/* Contenedor principal */
+.asistencia-card {
+  max-width: 400px;
+  margin: 30px auto;
+  padding: 20px;
+  text-align: center;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Título */
+.asistencia-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #222;
+}
+
+/* Texto de asistencia (ej. 4/6) */
+.asistencia-count {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #444;
+  margin-bottom: 12px;
+}
+
+/* Barra de progreso (fondo) */
+.asistencia-progress {
+  width: 100%;
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Barra de progreso (relleno) */
+.asistencia-progress-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 8px;
+  transition: width 0.5s ease, background-color 0.5s ease;
+}
+
+/* Colores dinámicos */
+.progress-bar-gray {
+  background-color: #9e9e9e;
+}
+
+.progress-bar-yellow {
+  background-color: #fbc02d;
+}
+
+.progress-bar-green {
+  background-color: #4caf50;
+}
+
+/* Texto de error */
+.asistencia-error {
+  display: block;
+  margin-top: 8px;
+  color: #d32f2f;
+  font-size: 0.9rem;
+}
+
+/* 🔹 Responsividad */
+@media (max-width: 600px) {
+  .asistencia-card {
+    max-width: 90%;
+    padding: 16px;
+  }
+
+  .asistencia-title {
+    font-size: 1.1rem;
+  }
+
+  .asistencia-count {
+    font-size: 1rem;
+  }
+}

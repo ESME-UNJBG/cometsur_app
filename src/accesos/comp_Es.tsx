@@ -201,7 +201,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
 
         {/* FOOTER */}
         <div className="compu-footer">
-          {[1, 2, 3, 4].map((num) => (
+          {[1, 2, 3, 4, 5, 6].map((num) => (
             <button
               key={num}
               type="button"
