@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "../css/Ventana.css";
+import "../css/accesos.css";
 
 interface ComputadoraModalProps {
   onClose: () => void;
@@ -23,17 +23,13 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     const stored = localStorage.getItem("usuarios");
     if (stored) {
       try {
-        const parsed = JSON.parse(stored) as unknown;
+        const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
-          const normalized = parsed.map((p) => {
-            const obj = p as Partial<Usuario>;
-            return {
-              id: String(obj.id ?? ""),
-              name: String(obj.name ?? ""),
-              asistencia:
-                typeof obj.asistencia === "number" ? obj.asistencia : null,
-            } as Usuario;
-          });
+          const normalized = parsed.map((p) => ({
+            id: String(p.id ?? ""),
+            name: String(p.name ?? ""),
+            asistencia: typeof p.asistencia === "number" ? p.asistencia : null,
+          }));
           setUsuarios(normalized);
         } else {
           setUsuarios([]);
@@ -88,15 +84,8 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
       if (!res.ok) {
         let backendMsg = "";
         try {
-          const body = (await res.json()) as unknown;
-          if (
-            body &&
-            typeof body === "object" &&
-            "message" in body &&
-            typeof (body as { message?: unknown }).message === "string"
-          ) {
-            backendMsg = `: ${(body as { message: string }).message}`;
-          }
+          const body = await res.json();
+          if (body?.message) backendMsg = `: ${body.message}`;
         } catch {
           // ignore parse errors
         }
@@ -107,72 +96,50 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
         u.id === selectedId ? { ...u, asistencia: num } : u
       );
       setUsuarios(nuevos);
-      try {
-        localStorage.setItem("usuarios", JSON.stringify(nuevos));
-      } catch {
-        console.warn("No se pudo actualizar localStorage");
-      }
-
+      localStorage.setItem("usuarios", JSON.stringify(nuevos));
       setSuccessMsg(`Asistencia ${num} guardada.`);
     } catch (err: unknown) {
       console.error("Error actualizando asistencia:", err);
-      let message = "Error actualizando asistencia.";
-      if (err instanceof Error && err.message) message = err.message;
-      setErrorMsg(message);
+      setErrorMsg(
+        err instanceof Error ? err.message : "Error actualizando asistencia."
+      );
     } finally {
       setSending(false);
     }
   };
 
   return (
-    <div
-      className="login-container card"
-      style={{
-        maxHeight: "90vh",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <div
-        className="card-body d-flex flex-column"
-        style={{ flex: 1, overflow: "hidden" }}
-      >
-        {/* Contenido principal con scroll */}
-        <div style={{ flex: 1, overflowY: "auto" }}>
-          {/* Header */}
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <div style={{ width: "33%" }} />
-            <div style={{ width: "33%", textAlign: "center" }}>
-              <p className="m-0 fw-bold">Buscador</p>
-            </div>
-            <div style={{ width: "33%", textAlign: "right" }}>
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={onClose}
-              ></button>
-            </div>
+    <div className="compu-overlay">
+      <div className="compu-modal">
+        {/* HEADER */}
+        <div className="compu-header">
+          <h5>Buscador</h5>
+          <button type="button" className="close-button" onClick={onClose}>
+            &times;
+          </button>
+        </div>
+
+        {/* BODY */}
+        <div className="compu-body">
+          <div className="compu-search">
+            <input
+              type="text"
+              placeholder="Buscar por nombre..."
+              className="form-control mb-2"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                if (e.target.value === "") {
+                  setSelectedId(null);
+                  setErrorMsg(null);
+                  setSuccessMsg(null);
+                }
+              }}
+            />
           </div>
 
-          {/* Buscador */}
-          <input
-            type="text"
-            placeholder="Buscar por nombre..."
-            className="form-control mb-3"
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-              if (e.target.value === "") {
-                setSelectedId(null);
-                setErrorMsg(null);
-                setSuccessMsg(null);
-              }
-            }}
-          />
-
-          {/* Tabla */}
-          <div className="table-responsive">
+          {/* Tabla con scroll interno */}
+          <div className="table-scroll">
             <table className="table table-striped">
               <thead>
                 <tr>
@@ -189,15 +156,13 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
                       <td
                         role="button"
                         tabIndex={0}
-                        onKeyDown={(
-                          e: React.KeyboardEvent<HTMLTableCellElement>
-                        ) => {
+                        onClick={() => handleSelectUser(user)}
+                        onKeyDown={(e) => {
                           if (e.key === "Enter" || e.key === " ") {
                             e.preventDefault();
                             handleSelectUser(user);
                           }
                         }}
-                        onClick={() => handleSelectUser(user)}
                         style={{ cursor: "pointer", color: "blue" }}
                       >
                         {user.name}
@@ -227,7 +192,6 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
               {successMsg}
             </div>
           )}
-
           {selectedId && (
             <div className="alert alert-info mt-2" role="status">
               <strong>Usuario seleccionado.</strong>
@@ -235,14 +199,13 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
           )}
         </div>
 
-        {/* Botones de asistencia fijos al fondo */}
-        <div className="d-flex flex-wrap justify-content-center gap-2 mt-3">
+        {/* FOOTER */}
+        <div className="compu-footer">
           {[1, 2, 3, 4].map((num) => (
             <button
               key={num}
               type="button"
-              className="btn btn-primary flex-grow-1"
-              style={{ minWidth: "120px", maxWidth: "200px" }}
+              className="btn btn-primary"
               onClick={() => handleAsistencia(num)}
               disabled={!selectedId || sending}
               title={

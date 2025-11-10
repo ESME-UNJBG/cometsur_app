@@ -1,40 +1,43 @@
 import { useState, useEffect } from "react";
 import { QRCodeCanvas } from "qrcode.react";
+import ima3 from "../Fuciones/imag/cometsur.png"; // ✅ tu logo
 import "../css/QrCode.css";
 
 const QRCodeExample = () => {
-  const userId = localStorage.getItem("userId"); // 👈 se queda fijo
+  const userId = localStorage.getItem("userId"); // ID único de Mongo
   const [userName, setUserName] = useState<string | null>(
     localStorage.getItem("userName")
   );
 
-  // 🔄 Actualiza solo el nombre cada 1s
   useEffect(() => {
     const interval = setInterval(() => {
       setUserName(localStorage.getItem("userName"));
     }, 1000);
-
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="qr-container position-absolute top-50 start-50 translate-middle">
+    <div className="qr-container">
       <h4>Credenciales</h4>
       <div className="qr-content">
         {userId ? (
-          <QRCodeCanvas
-            value={userId}
-            size={150}
-            bgColor="#ffffff"
-            fgColor="#000000"
-            level="H"
-            className="qr-code"
-          />
+          <div className="qr-wrapper">
+            <QRCodeCanvas
+              value={userId}
+              size={150}
+              bgColor="#ffffff"
+              fgColor="#000000"
+              level="H"
+              className="qr-code"
+            />
+            {/* ✅ Logo centrado */}
+            <img src={ima3} alt="Logo empresa" className="qr-logo" />
+          </div>
         ) : (
           <p>Cargando el ID de usuario...</p>
         )}
 
-        {/* 👤 Mostrar nombre */}
+        {/* 👤 Información del usuario */}
         <div className="user-info">
           <svg
             xmlns="http://www.w3.org/2000/svg"

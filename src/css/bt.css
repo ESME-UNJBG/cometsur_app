@@ -1,0 +1,150 @@
+/* --- Fondo difuminado tipo modal (igual para todas las pantallas) --- */
+.es-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45); /* oscurece un poco el fondo */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px); /* mantiene el difuminado */
+}
+
+/* --- Tarjeta central --- */
+.es-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  padding: 1.8rem 2rem;
+  width: 90%;
+  max-width: 380px;
+  text-align: center;
+  position: relative;
+  animation: fadeIn 0.3s ease;
+}
+
+/* --- Animación suave --- */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* --- Botón para cerrar (X) --- */
+.btn-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 1.4rem;
+  color: #555;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.btn-close:hover {
+  color: #cf0000;
+}
+
+/* --- Título --- */
+.es-card h5 {
+  font-weight: 700;
+  margin-bottom: 1.4rem;
+  color: #222;
+  font-size: 1.2rem;
+}
+
+/* --- Botones --- */
+.es-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.es-btn {
+  width: 100%;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.9rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.25s ease, transform 0.1s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.es-btn:hover {
+  transform: scale(1.02);
+}
+
+.es-btn svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* --- Colores de botones --- */
+.es-btn-phone {
+  background: #2e6f70;
+}
+.es-btn-phone:hover {
+  background: #255c5d;
+}
+
+.es-btn-computer {
+  background: #6b2d3c;
+}
+.es-btn-computer:hover {
+  background: #59222f;
+}
+
+/* --- Responsivo (solo ajusta tamaño, no fondo) --- */
+@media (max-width: 768px) {
+  .es-card {
+    max-width: 320px;
+    padding: 1.5rem;
+  }
+
+  .es-btn {
+    font-size: 0.95rem;
+  }
+
+  /* ❌ Eliminamos cualquier cambio en el fondo */
+  .es-container {
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+  }
+}
+
+/* --- Animaciones para abrir/cerrar suavemente --- */
+.fade-enter {
+  opacity: 0;
+  transform: scale(0.95);
+}
+.fade-enter-active {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-exit {
+  opacity: 1;
+  transform: scale(1);
+}
+.fade-exit-active {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}

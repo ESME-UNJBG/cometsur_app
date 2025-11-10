@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "../css/Ventana.css";
+import "../css/accesos.css";
 
 interface ComputadoraModalProps {
   onClose: () => void;
@@ -11,17 +11,18 @@ interface Usuario {
 }
 
 const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState(false);
+  const [deleting, setDeleting] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("usuarios");
     if (stored) {
       try {
-        setUsuarios(JSON.parse(stored));
+        const parsed = JSON.parse(stored) as Usuario[];
+        setUsuarios(Array.isArray(parsed) ? parsed : []);
       } catch {
         setUsuarios([]);
       }
@@ -32,17 +33,17 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     user.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleSelectUser = (user: Usuario) => {
+  const handleSelectUser = (user: Usuario): void => {
     setSearchTerm(user.name);
     setSelectedId(user.id);
     setErrorMsg(null);
   };
 
-  const handleEliminar = async () => {
+  const handleEliminar = async (): Promise<void> => {
     setErrorMsg(null);
 
     if (!selectedId) {
-      setErrorMsg("No hay ningún usuario seleccionado para eliminar.");
+      setErrorMsg("Selecciona un usuario para eliminar.");
       return;
     }
 
@@ -56,7 +57,6 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
 
     try {
       setDeleting(true);
-
       const response = await fetch(url, {
         method: "DELETE",
         headers: {
@@ -68,13 +68,17 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
       if (!response.ok) {
         let backendMsg = "";
         try {
-          const body = await response.json();
-          if (body && typeof body === "object" && "message" in body) {
-            const maybeMsg = (body as Record<string, unknown>)["message"];
-            if (typeof maybeMsg === "string") backendMsg = `: ${maybeMsg}`;
+          const body: unknown = await response.json();
+          if (
+            typeof body === "object" &&
+            body !== null &&
+            "message" in body &&
+            typeof (body as Record<string, unknown>).message === "string"
+          ) {
+            backendMsg = `: ${(body as { message: string }).message}`;
           }
         } catch {
-          // ignore parse errors
+          /* ignorar parseo */
         }
         throw new Error(`Error eliminando usuario${backendMsg}`);
       }
@@ -82,52 +86,36 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
       const nuevos = usuarios.filter((u) => u.id !== selectedId);
       setUsuarios(nuevos);
       localStorage.setItem("usuarios", JSON.stringify(nuevos));
-
       onClose();
-    } catch (err: unknown) {
-      console.error("Error eliminando usuario:", err);
-      let message = "Error eliminando usuario";
+    } catch (err) {
       if (err instanceof Error) {
-        message = err.message;
-      } else if (typeof err === "string") {
-        message = err;
+        setErrorMsg(err.message);
+      } else {
+        setErrorMsg("Error eliminando usuario");
       }
-      setErrorMsg(message);
     } finally {
       setDeleting(false);
     }
   };
 
   return (
-    <div
-      className="login-container card"
-      style={{
-        maxHeight: "90vh",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <div
-        className="card-body d-flex flex-column"
-        style={{ flex: 1, overflow: "hidden" }}
-      >
-        {/* Contenido principal con scroll */}
-        <div style={{ flex: 1, overflowY: "auto" }}>
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <div style={{ width: "33%" }}></div>
-            <div style={{ width: "33%", textAlign: "center" }}>
-              <p className="m-0 fw-bold">Buscador</p>
-            </div>
-            <div style={{ width: "33%", textAlign: "right" }}>
-              <button
-                type="button"
-                className="btn-close"
-                aria-label="Cerrar"
-                onClick={onClose}
-              ></button>
-            </div>
-          </div>
+    <div className="compu-overlay">
+      <div className="compu-modal">
+        {/* ======= CABECERA ======= */}
+        <div className="compu-header">
+          <h5>Buscador</h5>
+          <button
+            type="button"
+            className="close-button"
+            aria-label="Cerrar"
+            onClick={onClose}
+          >
+            &times;
+          </button>
+        </div>
 
+        {/* ======= CUERPO ======= */}
+        <div className="compu-body">
           <input
             type="text"
             placeholder="Buscar por nombre..."
@@ -139,10 +127,22 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
             }}
           />
 
-          {/* Tabla responsiva */}
-          <div className="table-responsive">
+          <div
+            style={{
+              maxHeight: "50vh",
+              overflowY: "auto",
+              borderRadius: "8px",
+            }}
+          >
             <table className="table table-striped">
-              <thead>
+              <thead
+                style={{
+                  position: "sticky",
+                  top: 0,
+                  backgroundColor: "#f8f9fa",
+                  zIndex: 2,
+                }}
+              >
                 <tr>
                   <th>Nombre</th>
                 </tr>
@@ -150,13 +150,15 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
               <tbody>
                 {filteredData.length > 0 ? (
                   filteredData.map((user) => (
-                    <tr key={user.id}>
-                      <td
-                        style={{ cursor: "pointer", color: "blue" }}
-                        onClick={() => handleSelectUser(user)}
-                      >
-                        {user.name}
-                      </td>
+                    <tr
+                      key={user.id}
+                      onClick={() => handleSelectUser(user)}
+                      style={{
+                        cursor: "pointer",
+                        color: selectedId === user.id ? "blue" : "black",
+                      }}
+                    >
+                      <td>{user.name}</td>
                     </tr>
                   ))
                 ) : (
@@ -175,7 +177,6 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
               {errorMsg}
             </div>
           )}
-
           {selectedId && (
             <div className="alert alert-info mt-2">
               <strong>Usuario seleccionado:</strong> {searchTerm}
@@ -183,18 +184,12 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
           )}
         </div>
 
-        {/* Botón fijo al fondo */}
-        <div className="d-flex justify-content-center mt-3">
+        {/* ======= PIE ======= */}
+        <div className="compu-footer">
           <button
             className="btn btn-danger"
             onClick={handleEliminar}
             disabled={!selectedId || deleting}
-            aria-disabled={!selectedId || deleting}
-            title={
-              !selectedId
-                ? "Selecciona primero un usuario"
-                : "Eliminar usuario seleccionado"
-            }
           >
             {deleting ? "Eliminando..." : "Eliminar"}
           </button>

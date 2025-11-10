@@ -1,0 +1,185 @@
+/* ===== Overlay del modal exclusivo ===== */
+.compu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1200;
+  padding: 1rem;
+  backdrop-filter: blur(2px);
+}
+
+/* ===== Contenedor principal ===== */
+.compu-modal {
+  background: #ffffff;
+  border-radius: 10px;
+  width: 60%;
+  max-width: 950px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+/* ===== Cabecera ===== */
+.compu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 0.75rem 1rem;
+  flex-shrink: 0;
+}
+
+.compu-header h5 {
+  flex: 1;
+  text-align: center;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* ===== Cuerpo general ===== */
+.compu-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 1rem 1.5rem;
+  overflow: hidden; /* impide que se desplace todo el cuerpo */
+}
+
+/* ===== Buscador fijo ===== */
+.compu-search {
+  flex-shrink: 0;
+  margin-bottom: 0.75rem;
+}
+
+/* ===== Contenedor con scroll solo para la tabla ===== */
+.table-scroll {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  background: #fff;
+}
+
+/* ===== Encabezado fijo dentro de la tabla ===== */
+.table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-scroll thead th {
+  position: sticky;
+  top: 0;
+  background: #f1f3f4;
+  z-index: 5;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* ===== Estilo base de la tabla ===== */
+.table-scroll td,
+.table-scroll th {
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.table-scroll tbody tr:nth-child(even) {
+  background-color: #f8f9fa;
+}
+
+/* ===== Mensajes ===== */
+.alert {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+}
+
+/* ===== Footer (botones fijos abajo) ===== */
+.compu-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-top: 1px solid #dee2e6;
+  background: #fafafa;
+  flex-shrink: 0;
+}
+
+.compu-footer button {
+  min-width: 120px;
+  max-width: 180px;
+  flex: 1;
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+/* ===== Responsividad ===== */
+@media (max-width: 900px) {
+  .compu-modal {
+    width: 85%;
+    max-height: 92vh;
+  }
+
+  .compu-body {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .compu-modal {
+    width: 95%;
+    height: 70vh;
+    border-radius: 8px;
+  }
+
+  .table-scroll td,
+  .table-scroll th {
+    font-size: 0.85rem;
+    padding: 6px 8px;
+  }
+
+  .compu-footer button {
+    font-size: 0.9rem;
+    min-width: 100px;
+  }
+}
+
+/* ===== Animación ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+/* ===== Botón de cierre (X) ===== */
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  padding: 0 0.4rem;
+  line-height: 1;
+}
+
+.close-button:hover {
+  color: #ff3b30;
+  transform: scale(1.1);
+}

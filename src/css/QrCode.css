@@ -1,34 +1,100 @@
+/* === CONTENEDOR PRINCIPAL === */
 .qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
+  z-index: 2; /* mantiene prioridad pero sin tapar todo */
+  position: relative; /* evita superposición global */
+  width: 100%;
+  padding: 10px 0;
 }
 
+/* === CONTENIDO (QR + INFO) === */
 .qr-content {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 20px;
+  flex-wrap: wrap; /* Permite bajar en pantallas pequeñas */
 }
 
+/* === ENVOLTURA DEL QR === */
+.qr-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* === CÓDIGO QR === */
 .qr-code {
   width: auto;
   height: auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15); /* ligera sombra */
+  border-radius: 8px; /* bordes suaves */
+  background-color: #fff; /* fondo blanco limpio */
 }
 
+/* === LOGO EN EL CENTRO DEL QR === */
+.qr-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 50%;
+  background: #fff;
+  padding: 4px;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+/* === ÍCONO DE USUARIO === */
 .user-icon {
   width: 90px;
   height: 90px;
   fill: #000;
 }
 
+/* === NOMBRE DE USUARIO === */
 .user-name {
   margin-top: 10px;
-  font-size: 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #333;
 }
 
-/* 📱 Solo agrandar el QR en celular */
+/* === CONTENEDOR DE INFORMACIÓN === */
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* === RESPONSIVE: para pantallas pequeñas === */
 @media (max-width: 768px) {
   .qr-code {
     width: 160px !important;
     height: 160px !important;
+  }
+
+  .qr-logo {
+    width: 35px;
+    height: 35px;
+  }
+
+  .user-icon {
+    width: 70px;
+    height: 70px;
+  }
+
+  .user-name {
+    font-size: 0.7rem;
+  }
+
+  .qr-content {
+    flex-direction: column; /* QR arriba, info abajo */
+    gap: 10px;
   }
 }

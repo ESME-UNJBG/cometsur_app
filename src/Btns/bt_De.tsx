@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../css/Ventana.css";
+import "../css/bt.css";
 import ComputadoraModal from "../accesos/comp_De";
 import CelularModal from "../accesos/cel_De";
 
@@ -8,83 +8,85 @@ interface DeProps {
 }
 
 const De: React.FC<DeProps> = ({ onClose }) => {
-  const [showComputadoraModal, setShowComputadoraModal] =
-    useState<boolean>(false);
-  const [showCelularModal, setShowCelularModal] = useState<boolean>(false);
+  const [showComputadoraModal, setShowComputadoraModal] = useState(false);
+  const [showCelularModal, setShowCelularModal] = useState(false);
+  const [fadeOut, setFadeOut] = useState(false);
+
+  const handleClose = () => {
+    setFadeOut(true);
+    setTimeout(() => onClose(), 300); // 300 ms coincide con el CSS
+  };
+
+  const handleOpenCelular = () => {
+    setFadeOut(true);
+    setTimeout(() => {
+      setShowCelularModal(true);
+    }, 300);
+  };
+
+  const handleOpenComputadora = () => {
+    setFadeOut(true);
+    setTimeout(() => {
+      setShowComputadoraModal(true);
+    }, 300);
+  };
 
   return (
     <>
-      <div className="login-container card">
-        <div className="card-body">
-          {/* Header */}
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <div style={{ width: "33%" }} />
-            <div style={{ width: "33%", textAlign: "center" }}>
-              <p className="m-0 fw-bold">Eliminar</p>
-            </div>
-            <div style={{ width: "33%", textAlign: "right" }}>
+      {!showCelularModal && !showComputadoraModal && (
+        <div
+          className={`es-container ${
+            fadeOut ? "fade-exit-active" : "fade-enter-active"
+          }`}
+        >
+          <div className="es-card">
+            <button
+              className="btn-close"
+              aria-label="Close"
+              onClick={handleClose}
+            ></button>
+
+            <h5>Eliminar</h5>
+
+            <div className="es-buttons">
               <button
-                type="button"
-                className="btn-close"
-                aria-label="Close"
-                onClick={onClose}
-              ></button>
+                className="es-btn es-btn-phone"
+                onClick={handleOpenCelular}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  className="bi bi-phone"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M11 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z" />
+                  <path d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2" />
+                </svg>
+                Celular
+              </button>
+
+              <button
+                className="es-btn es-btn-computer"
+                onClick={handleOpenComputadora}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  className="bi bi-pc-display-horizontal"
+                  viewBox="0 0 16 16"
+                >
+                  <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v7A1.5 1.5 0 0 0 1.5 10H6v1H1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5v-1h4.5A1.5 1.5 0 0 0 16 8.5v-7A1.5 1.5 0 0 0 14.5 0z" />
+                </svg>
+                Computadora
+              </button>
             </div>
-          </div>
-
-          {/* Botones */}
-          <div className="d-flex justify-content-between mt-3">
-            {/* Celular */}
-            <button
-              type="button"
-              className="btn text-white w-50 me-2"
-              style={{ background: "#2e6f70" }}
-              onClick={() => setShowCelularModal(true)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="40"
-                height="40"
-                fill="currentColor"
-                className="bi bi-phone"
-                viewBox="0 0 16 16"
-              >
-                <path d="M11 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1zM5 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2z" />
-                <path d="M8 14a1 1 0 1 0 0-2 1 1 0 0 0 0 2" />
-              </svg>
-            </button>
-
-            {/* Computadora */}
-            <button
-              type="button"
-              className="btn text-white w-50 ms-2"
-              style={{ background: "#6b2d3c" }}
-              onClick={() => setShowComputadoraModal(true)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="40"
-                height="40"
-                fill="currentColor"
-                className="bi bi-pc-display-horizontal"
-                viewBox="0 0 16 16"
-              >
-                <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v7A1.5 1.5 0 0 0 1.5 10H6v1H1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5v-1h4.5A1.5 1.5 0 0 0 16 8.5v-7A1.5 1.5 0 0 0 14.5 0zm0 1h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5M12 12.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0m2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0M1.5 12h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1M1 14.25a.25.25 0 0 1 .25-.25h5.5a.25.25 0 1 1 0 .5h-5.5a.25.25 0 0 1-.25-.25" />
-              </svg>
-            </button>
           </div>
         </div>
-      </div>
-
-      {/* Modal Computadora */}
-      {showComputadoraModal && (
-        <ComputadoraModal onClose={() => setShowComputadoraModal(false)} />
       )}
 
-      {/* Modal Celular */}
-      {showCelularModal && (
-        <CelularModal onClose={() => setShowCelularModal(false)} />
-      )}
+      {/* 🔹 Renderizar los modales posteriores */}
+      {showCelularModal && <CelularModal onClose={onClose} />}
+      {showComputadoraModal && <ComputadoraModal onClose={onClose} />}
     </>
   );
 };
