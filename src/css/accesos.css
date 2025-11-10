@@ -116,7 +116,7 @@
 
 /* ===== Botones uniformes ===== */
 .compu-footer button {
-  width: 140px; /* todos los botones del mismo ancho */
+  width: 240px; /* todos los botones del mismo ancho */
   height: 42px;
   text-align: center;
   padding: 0.5rem 1rem;
