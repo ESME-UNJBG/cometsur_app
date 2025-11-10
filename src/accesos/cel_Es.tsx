@@ -164,7 +164,12 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
 
       // Mostrar overlay actualizado con los datos nuevos
       setOverlayVisible(true);
-      setTimeout(() => setOverlayVisible(false), 2000);
+
+      // ⭐ MODIFICACIÓN: Resetear después de 2 segundos
+      setTimeout(() => {
+        setOverlayVisible(false);
+        setUsuarioEncontrado(null); // Esto hará que los botones desaparezcan y vuelvan a su estado inicial
+      }, 2000);
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Error actualizando asistencia.";
