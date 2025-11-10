@@ -187,6 +187,13 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     };
   }, [startScanner, stopScanner]);
 
+  // 🔹 Calcular el siguiente botón verde
+  const siguienteAsistencia =
+    usuarioEncontrado?.asistencia !== undefined &&
+    usuarioEncontrado?.asistencia !== null
+      ? usuarioEncontrado.asistencia + 1
+      : 1;
+
   return (
     <div className="login-container card">
       <div className="card-body">
@@ -251,27 +258,29 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
               <strong>ID:</strong> {qrContent}
               <br />
               <strong>Nombre:</strong> {usuarioEncontrado.name}
-              {usuarioEncontrado.asistencia && (
-                <>
-                  <br />
-                  <strong>Asistencia actual:</strong>{" "}
-                  {usuarioEncontrado.asistencia}
-                </>
-              )}
+              <br />
+              <strong>Asistencia actual:</strong>{" "}
+              {usuarioEncontrado.asistencia ?? 0}
             </div>
+
             <div className="d-flex flex-wrap justify-content-center gap-2 mt-3">
-              {[1, 2, 3, 4, 5, 6].map((num) => (
-                <button
-                  key={num}
-                  type="button"
-                  className="btn btn-primary flex-grow-1"
-                  style={{ minWidth: "120px", maxWidth: "200px" }}
-                  onClick={() => handleAsistencia(num)}
-                  disabled={sending}
-                >
-                  {sending ? "Actualizando..." : `Asistencia ${num}`}
-                </button>
-              ))}
+              {[1, 2, 3, 4, 5, 6].map((num) => {
+                const isNext = num === siguienteAsistencia;
+                return (
+                  <button
+                    key={num}
+                    type="button"
+                    className={`btn ${
+                      isNext ? "btn-success" : "btn-primary"
+                    } flex-grow-1`}
+                    style={{ minWidth: "120px", maxWidth: "200px" }}
+                    onClick={() => handleAsistencia(num)}
+                    disabled={sending}
+                  >
+                    {sending ? "Actualizando..." : `Asistencia ${num}`}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
