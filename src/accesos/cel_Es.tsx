@@ -16,7 +16,7 @@ const QR_REGION_ID = "html5qr-reader";
 
 const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
   const [scannerStatus, setScannerStatus] = useState<
-    "iniciando" | "escaneando" | "error" | "detenido"
+    "iniciando" | "escaneando" | "error"
   >("iniciando");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -45,20 +45,6 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     }
   }, []);
 
-  // 🔹 Detener scanner
-  const stopScanner = useCallback(async () => {
-    if (html5QrCodeRef.current) {
-      try {
-        await html5QrCodeRef.current.stop();
-        await html5QrCodeRef.current.clear();
-      } catch (error) {
-        console.warn("Error deteniendo scanner:", error);
-      }
-      html5QrCodeRef.current = null;
-    }
-    setScannerStatus("detenido");
-  }, []);
-
   // 🔹 Buscar usuario
   const buscarUsuario = useCallback((scannedId: string): Usuario | null => {
     const user = usuariosRef.current.find(
@@ -71,26 +57,27 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
   // 🔹 Procesar QR escaneado
   const procesarQR = useCallback(
     async (decodedText: string) => {
+      if (sending) return; // evita múltiples escaneos mientras se envía
       const scannedId = decodedText.trim();
       setQrContent(scannedId);
       setErrorMsg(null);
       setSuccessMsg(null);
 
       const user = buscarUsuario(scannedId);
-
-      if (user) setUsuarioEncontrado(user);
-      else {
+      if (user) {
+        setUsuarioEncontrado(user);
+      } else {
         setUsuarioEncontrado(null);
         setErrorMsg(`Usuario con ID "${scannedId}" no encontrado`);
       }
-
-      await stopScanner();
     },
-    [buscarUsuario, stopScanner]
+    [buscarUsuario, sending]
   );
 
-  // 🔹 Iniciar scanner
+  // 🔹 Iniciar scanner (solo una vez)
   const startScanner = useCallback(async () => {
+    if (html5QrCodeRef.current) return;
+
     if (!navigator.mediaDevices) {
       setErrorMsg("Tu navegador no soporta acceso a la cámara.");
       setScannerStatus("error");
@@ -100,8 +87,6 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     setScannerStatus("iniciando");
     setErrorMsg(null);
     setSuccessMsg(null);
-    setQrContent(null);
-    setUsuarioEncontrado(null);
 
     try {
       const html5QrCode = new Html5Qrcode(QR_REGION_ID, { verbose: false });
@@ -109,30 +94,38 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
 
       const config = { fps: 10, qrbox: { width: 250, height: 250 } };
 
-      const onScanSuccess = async (decodedText: string) => {
-        await procesarQR(decodedText);
-      };
-      const onScanFailure = (error: string) => {
-        if (!error.includes("No multi format QR code"))
-          console.log("Escaneo fallido:", error);
-      };
-
       await html5QrCode.start(
         { facingMode: "environment" },
         config,
-        onScanSuccess,
-        onScanFailure
+        (decodedText: string) => procesarQR(decodedText),
+        (error: string) => {
+          if (!error.includes("No multi format QR code"))
+            console.log("Escaneo fallido:", error);
+        }
       );
+
       setScannerStatus("escaneando");
     } catch (err) {
       console.error("❌ Error al iniciar cámara:", err);
       setErrorMsg("No se pudo acceder a la cámara.");
       setScannerStatus("error");
-      await stopScanner();
     }
-  }, [procesarQR, stopScanner]);
+  }, [procesarQR]);
 
-  // 🔹 Pasar asistencia (flujo corregido)
+  // 🔹 Detener scanner (solo al cerrar)
+  const stopScanner = useCallback(async () => {
+    if (html5QrCodeRef.current) {
+      try {
+        await html5QrCodeRef.current.stop();
+        await html5QrCodeRef.current.clear();
+      } catch (error) {
+        console.warn("Error deteniendo scanner:", error);
+      }
+      html5QrCodeRef.current = null;
+    }
+  }, []);
+
+  // 🔹 Pasar asistencia
   const handleAsistencia = async (num: number) => {
     if (!usuarioEncontrado) {
       setErrorMsg("No hay usuario seleccionado para pasar asistencia.");
@@ -149,7 +142,6 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
 
     try {
       setSending(true);
-
       const res = await fetch(url, {
         method: "PUT",
         headers: {
@@ -161,41 +153,33 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
 
       if (!res.ok) throw new Error(`Error en la petición: ${res.statusText}`);
 
-      const nuevosUsuarios = usuarios.map((u) =>
+      const nuevos = usuarios.map((u) =>
         u.id === usuarioEncontrado.id ? { ...u, asistencia: num } : u
       );
-      setUsuarios(nuevosUsuarios);
-      usuariosRef.current = nuevosUsuarios;
-      localStorage.setItem("usuarios", JSON.stringify(nuevosUsuarios));
+      setUsuarios(nuevos);
+      usuariosRef.current = nuevos;
+      localStorage.setItem("usuarios", JSON.stringify(nuevos));
 
-      // ✅ Mostrar mensaje temporal de éxito
       setSuccessMsg(
         `✅ Asistencia ${num} guardada para ${usuarioEncontrado.name}`
       );
 
-      // 🔄 Esperar 2 s, limpiar, liberar cámara y reactivar escáner
-      setTimeout(async () => {
+      // 🔹 Mostrar mensaje 2 s y reiniciar escaneo
+      setTimeout(() => {
         setSuccessMsg(null);
         setUsuarioEncontrado(null);
         setQrContent(null);
-
-        const container = document.getElementById(QR_REGION_ID);
-        if (container) container.innerHTML = "";
-
-        await stopScanner();
-        await new Promise((resolve) => setTimeout(resolve, 500)); // evita bloqueo
-        await startScanner();
       }, 2000);
-    } catch (err: unknown) {
-      let message = "Error actualizando asistencia.";
-      if (err instanceof Error) message = err.message;
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Error actualizando asistencia.";
       setErrorMsg(message);
     } finally {
       setSending(false);
     }
   };
 
-  // 🔹 Inicio del scanner al montar
+  // 🔹 Iniciar cámara al montar
   useEffect(() => {
     startScanner();
     return () => {
@@ -211,9 +195,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
           <div style={{ width: "33%" }} />
           <div style={{ width: "33%", textAlign: "center" }}>
             <p className="m-0 fw-bold">
-              {scannerStatus === "detenido" && usuarioEncontrado
-                ? "Usuario Encontrado"
-                : "Escanear QR"}
+              {usuarioEncontrado ? "Usuario Encontrado" : "Escanear QR"}
             </p>
           </div>
           <div style={{ width: "33%", textAlign: "right" }}>
@@ -230,55 +212,35 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
         </div>
 
         {/* Scanner */}
-        {scannerStatus !== "detenido" && (
-          <div
-            style={{
-              width: "100%",
-              height: "320px",
-              border: "2px solid #ccc",
-              borderRadius: "8px",
-              background: "#000",
-              overflow: "hidden",
-              position: "relative",
-            }}
-          >
-            <div id={QR_REGION_ID} style={{ width: "100%", height: "100%" }} />
-            {scannerStatus === "iniciando" && (
-              <div
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  color: "white",
-                  textAlign: "center",
-                  backgroundColor: "rgba(0,0,0,0.7)",
-                  padding: "10px 20px",
-                  borderRadius: "5px",
-                }}
-              >
-                Iniciando cámara...
-              </div>
-            )}
-            {scannerStatus === "escaneando" && (
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: "10px",
-                  left: 0,
-                  right: 0,
-                  textAlign: "center",
-                  color: "white",
-                  backgroundColor: "rgba(0,0,0,0.7)",
-                  padding: "5px",
-                  fontSize: "14px",
-                }}
-              >
-                Escaneando... acerca el código QR
-              </div>
-            )}
-          </div>
-        )}
+        <div
+          style={{
+            width: "100%",
+            height: "320px",
+            border: "2px solid #ccc",
+            borderRadius: "8px",
+            background: "#000",
+            overflow: "hidden",
+            position: "relative",
+          }}
+        >
+          <div id={QR_REGION_ID} style={{ width: "100%", height: "100%" }} />
+          {scannerStatus === "iniciando" && (
+            <div
+              style={{
+                position: "absolute",
+                top: "50%",
+                left: "50%",
+                transform: "translate(-50%, -50%)",
+                color: "white",
+                backgroundColor: "rgba(0,0,0,0.7)",
+                padding: "10px 20px",
+                borderRadius: "5px",
+              }}
+            >
+              Iniciando cámara...
+            </div>
+          )}
+        </div>
 
         {/* Resultado */}
         {usuarioEncontrado && (
@@ -311,14 +273,6 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
                 </button>
               ))}
             </div>
-          </div>
-        )}
-
-        {qrContent && !usuarioEncontrado && (
-          <div className="alert alert-warning mt-3">
-            <strong>ID escaneado:</strong> {qrContent}
-            <br />
-            <span className="text-danger">⚠ Usuario no encontrado</span>
           </div>
         )}
 
