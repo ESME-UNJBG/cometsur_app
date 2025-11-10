@@ -132,8 +132,8 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     }
   }, [procesarQR, stopScanner]);
 
-  // 🔹 Pasar asistencia
-  const handleAsistencia = async (num: number): Promise<void> => {
+  // 🔹 Pasar asistencia (versión actualizada)
+  const handleAsistencia = async (num: number) => {
     if (!usuarioEncontrado) {
       setErrorMsg("No hay usuario seleccionado para pasar asistencia.");
       return;
@@ -161,34 +161,32 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
 
       if (!res.ok) throw new Error(`Error en la petición: ${res.statusText}`);
 
-      const nuevos = usuarios.map((u) =>
+      // ✅ Actualizar usuarios en memoria y localStorage
+      const nuevosUsuarios = usuarios.map((u) =>
         u.id === usuarioEncontrado.id ? { ...u, asistencia: num } : u
       );
-      setUsuarios(nuevos);
-      usuariosRef.current = nuevos;
-      localStorage.setItem("usuarios", JSON.stringify(nuevos));
+      setUsuarios(nuevosUsuarios);
+      usuariosRef.current = nuevosUsuarios;
+      localStorage.setItem("usuarios", JSON.stringify(nuevosUsuarios));
 
-      // ✅ Mostrar mensaje de éxito (solo 1 vez)
+      // ✅ Mostrar mensaje de éxito
       setSuccessMsg(
         `✅ Asistencia ${num} guardada para ${usuarioEncontrado.name}`
       );
 
-      // 🔄 Esperar 2 segundos y reiniciar cámara
+      // ⏳ Esperar 2 segundos, luego limpiar y reactivar cámara
       setTimeout(async () => {
         setSuccessMsg(null);
-        await stopScanner();
+        setUsuarioEncontrado(null);
+        setQrContent(null);
+
         const container = document.getElementById(QR_REGION_ID);
-        if (container) {
-          try {
-            await startScanner();
-          } catch (error) {
-            console.error("Error reiniciando cámara:", error);
-            setErrorMsg("No se pudo reactivar la cámara.");
-            setScannerStatus("error");
-          }
-        }
+        if (container) container.innerHTML = "";
+
+        await stopScanner();
+        await startScanner();
       }, 2000);
-    } catch (err) {
+    } catch (err: unknown) {
       let message = "Error actualizando asistencia.";
       if (err instanceof Error) message = err.message;
       setErrorMsg(message);
@@ -197,7 +195,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     }
   };
 
-  // 🔹 Iniciar scanner al montar
+  // 🔹 Inicio del scanner al montar
   useEffect(() => {
     startScanner();
     return () => {
@@ -321,7 +319,6 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
             <strong>ID escaneado:</strong> {qrContent}
             <br />
             <span className="text-danger">⚠ Usuario no encontrado</span>
-            <br />
           </div>
         )}
 
