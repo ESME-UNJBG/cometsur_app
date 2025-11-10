@@ -77,7 +77,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
         setUsuarioEncontrado(user);
         setOverlayVisible(true);
         // Ocultar overlay luego de 2 segundos
-        setTimeout(() => setOverlayVisible(false), 2000);
+        setTimeout(() => setOverlayVisible(false), 100);
       } else {
         setUsuarioEncontrado(null);
         setErrorMsg(`Usuario con ID "${scannedId}" no encontrado`);
