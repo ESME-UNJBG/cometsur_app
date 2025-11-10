@@ -23,12 +23,12 @@ const Asistencia = () => {
     );
   }
 
-  const progress = (localAsistencia / 4) * 100;
+  const progress = (localAsistencia / 6) * 100;
 
   return (
     <div className="card p-3 text-center">
       <h5>Asistencia</h5>
-      <p className="fw-bold">{localAsistencia}/4</p>
+      <p className="fw-bold">{localAsistencia}/6</p>
       <div className="progress mt-2" style={{ height: "8px" }}>
         <div
           className="progress-bar"
