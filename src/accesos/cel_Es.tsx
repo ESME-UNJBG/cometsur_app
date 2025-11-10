@@ -76,8 +76,8 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
       if (user) {
         setUsuarioEncontrado(user);
         setOverlayVisible(true);
-        // Ocultar overlay luego de 0.5 segundos
-        setTimeout(() => setOverlayVisible(false), 1000);
+        // Ocultar overlay luego de 4 segundos
+        setTimeout(() => setOverlayVisible(false), 4000);
       } else {
         setUsuarioEncontrado(null);
         setErrorMsg(`Usuario con ID "${scannedId}" no encontrado`);
@@ -165,11 +165,11 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
       // Mostrar overlay actualizado con los datos nuevos
       setOverlayVisible(true);
 
-      // ⭐ MODIFICACIÓN: Resetear después de 2 segundos
+      // ⭐ MODIFICACIÓN: Resetear después de 0.5 segundos
       setTimeout(() => {
         setOverlayVisible(false);
         setUsuarioEncontrado(null); // Esto hará que los botones desaparezcan y vuelvan a su estado inicial
-      }, 2000);
+      }, 500);
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Error actualizando asistencia.";
