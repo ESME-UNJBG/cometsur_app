@@ -132,7 +132,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     }
   }, [procesarQR, stopScanner]);
 
-  // 🔹 Pasar asistencia (versión actualizada)
+  // 🔹 Pasar asistencia (flujo corregido)
   const handleAsistencia = async (num: number) => {
     if (!usuarioEncontrado) {
       setErrorMsg("No hay usuario seleccionado para pasar asistencia.");
@@ -161,7 +161,6 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
 
       if (!res.ok) throw new Error(`Error en la petición: ${res.statusText}`);
 
-      // ✅ Actualizar usuarios en memoria y localStorage
       const nuevosUsuarios = usuarios.map((u) =>
         u.id === usuarioEncontrado.id ? { ...u, asistencia: num } : u
       );
@@ -169,12 +168,12 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
       usuariosRef.current = nuevosUsuarios;
       localStorage.setItem("usuarios", JSON.stringify(nuevosUsuarios));
 
-      // ✅ Mostrar mensaje de éxito
+      // ✅ Mostrar mensaje temporal de éxito
       setSuccessMsg(
         `✅ Asistencia ${num} guardada para ${usuarioEncontrado.name}`
       );
 
-      // ⏳ Esperar 2 segundos, luego limpiar y reactivar cámara
+      // 🔄 Esperar 2 s, limpiar, liberar cámara y reactivar escáner
       setTimeout(async () => {
         setSuccessMsg(null);
         setUsuarioEncontrado(null);
@@ -184,6 +183,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
         if (container) container.innerHTML = "";
 
         await stopScanner();
+        await new Promise((resolve) => setTimeout(resolve, 500)); // evita bloqueo
         await startScanner();
       }, 2000);
     } catch (err: unknown) {
