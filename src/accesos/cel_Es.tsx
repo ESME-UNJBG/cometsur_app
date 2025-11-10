@@ -35,7 +35,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     const stored = localStorage.getItem("usuarios");
     if (stored) {
       try {
-        const usuariosData = JSON.parse(stored);
+        const usuariosData: Usuario[] = JSON.parse(stored);
         setUsuarios(usuariosData);
         usuariosRef.current = usuariosData;
       } catch {
@@ -46,7 +46,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
   }, []);
 
   // 🔹 Detener scanner
-  const stopScanner = useCallback(async () => {
+  const stopScanner = useCallback(async (): Promise<void> => {
     if (html5QrCodeRef.current) {
       try {
         await html5QrCodeRef.current.stop();
@@ -70,7 +70,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
 
   // 🔹 Procesar QR escaneado
   const procesarQR = useCallback(
-    async (decodedText: string) => {
+    async (decodedText: string): Promise<void> => {
       const scannedId = decodedText.trim();
       setQrContent(scannedId);
       setErrorMsg(null);
@@ -90,7 +90,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
   );
 
   // 🔹 Iniciar scanner
-  const startScanner = useCallback(async () => {
+  const startScanner = useCallback(async (): Promise<void> => {
     if (!navigator.mediaDevices) {
       setErrorMsg("Tu navegador no soporta acceso a la cámara.");
       setScannerStatus("error");
@@ -109,12 +109,14 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
 
       const config = { fps: 10, qrbox: { width: 250, height: 250 } };
 
-      const onScanSuccess = async (decodedText: string) => {
+      const onScanSuccess = async (decodedText: string): Promise<void> => {
         await procesarQR(decodedText);
       };
-      const onScanFailure = (error: string) => {
-        if (!error.includes("No multi format QR code"))
+
+      const onScanFailure = (error: string): void => {
+        if (!error.includes("No multi format QR code")) {
           console.log("Escaneo fallido:", error);
+        }
       };
 
       await html5QrCode.start(
@@ -133,7 +135,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
   }, [procesarQR, stopScanner]);
 
   // 🔹 Pasar asistencia
-  const handleAsistencia = async (num: number) => {
+  const handleAsistencia = async (num: number): Promise<void> => {
     if (!usuarioEncontrado) {
       setErrorMsg("No hay usuario seleccionado para pasar asistencia.");
       return;
@@ -159,33 +161,36 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
         body: JSON.stringify({ asistencia: num }),
       });
 
-      if (!res.ok) throw new Error(`Error en la petición: ${res.statusText}`);
+      if (!res.ok) {
+        throw new Error(`Error en la petición: ${res.statusText}`);
+      }
 
       const nuevos = usuarios.map((u) =>
         u.id === usuarioEncontrado.id ? { ...u, asistencia: num } : u
       );
+
       setUsuarios(nuevos);
       usuariosRef.current = nuevos;
       localStorage.setItem("usuarios", JSON.stringify(nuevos));
 
+      // ✅ Mensaje de éxito (solo una vez)
       setSuccessMsg(
         `✅ Asistencia ${num} guardada para ${usuarioEncontrado.name}`
       );
 
-      // 🔹 Cerrar ventana automáticamente después de 5 segundos
-      setTimeout(() => {
-        onClose();
-      }, 1000);
-    } catch (err: unknown) {
-      let message = "Error actualizando asistencia.";
-      if (err instanceof Error) message = err.message;
+      // 🔄 Reactivar cámara después del éxito
+      await stopScanner();
+      await startScanner();
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Error actualizando asistencia.";
       setErrorMsg(message);
     } finally {
       setSending(false);
     }
   };
 
-  // 🔹 Inicio del scanner al montar
+  // 🔹 Iniciar scanner al montar
   useEffect(() => {
     startScanner();
     return () => {
