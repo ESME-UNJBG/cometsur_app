@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import BotonExportarExcel from "./BotonExportarExcel";
-import BotonAnalisis from "./botonAnalisis";
+
 import { User } from "../interfaces/user";
 
 const TablaUsuarios: React.FC = () => {
@@ -59,7 +59,6 @@ const TablaUsuarios: React.FC = () => {
           <h5 className="m-0 fw-bold">Lista de asistentes</h5>
 
           <div className="d-flex gap-2">
-            <BotonAnalisis usuarios={usuarios} />
             <BotonExportarExcel usuarios={usuarios} />
           </div>
         </div>

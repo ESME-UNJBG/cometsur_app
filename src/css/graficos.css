@@ -1,215 +1,200 @@
-/* ======================================== */
-/* 🪟 MODAL PRINCIPAL - Sin scroll en desktop */
-/* ======================================== */
-
-.modal-overlay {
+/* BotonAnalisis.css - CSS ESPECÍFICO Y AISLADO */
+.ba-modal-overlay {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(4px);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
-  animation: fadeInOverlay 0.3s ease forwards;
-  padding: 20px 0;
-}
-
-.graf-modal-content {
-  background-color: #ffffff !important;
-  opacity: 1 !important;
-  border-radius: 32px !important;
-  padding: 2rem 1.5rem 1.5rem 1.5rem !important;
-  width: 90%;
-  max-width: 800px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
-  position: relative;
   z-index: 10000;
-  border: 0.5px solid rgba(0, 0, 0, 0.06);
-  text-align: center;
-  animation: fadeIn 0.3s ease;
-  margin: auto;
-  /* ELIMINAMOS EL SCROLL EN DESKTOP */
+  padding: 20px;
   overflow: hidden;
-  max-height: calc(100vh - 40px);
+  box-sizing: border-box;
 }
 
-@keyframes fadeInOverlay {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+.ba-modal-content {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 2rem;
+  width: 95%;
+  max-width: 900px;
+  max-height: 550px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  animation: ba-fadeIn 0.3s ease-out;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  /* Asegurar que no herede estilos del parent */
+  font-family: inherit;
+  line-height: normal;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.close-modal-x {
+.ba-close-btn {
   position: absolute;
-  top: 10px;
-  right: 14px;
+  top: 15px;
+  right: 20px;
   background: none;
   border: none;
+  font-size: 2rem;
   color: #666;
-  font-size: 1.8rem;
-  font-weight: bold;
   cursor: pointer;
-  line-height: 1;
-  transition: color 0.2s ease, transform 0.2s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 10001;
+  transition: all 0.2s ease;
+  border-radius: 50%;
+  padding: 0;
+  line-height: 1;
 }
 
-.close-modal-x:hover {
+.ba-close-btn:hover {
+  background: #f8f9fa;
   color: #000;
   transform: scale(1.1);
 }
 
-/* ======================================== */
-/* 🏗️ ESTRUCTURA PRINCIPAL */
-/* ======================================== */
+.ba-modal-title {
+  color: #2c3e50;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  padding: 0 50px;
+  line-height: 1.3;
+}
 
-.graf-container-main {
+.ba-container-main {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
+  gap: 2rem;
   align-items: start;
-  margin: 1.5rem 0;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0; /* Important para flex en algunos navegadores */
 }
 
-.graf-modal-title {
-  color: #333;
-  margin-bottom: 1.5rem;
-  font-weight: 600;
-  font-size: 1.5rem;
-}
-
-/* ======================================== */
-/* 💳 TARJETAS DE INGRESOS */
-/* ======================================== */
-
-.graf-tarjetas-section {
+.ba-tarjetas-section {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  height: fit-content;
 }
 
-.graf-tarjeta {
-  background: #ffffff;
-  border-radius: 16px;
+.ba-tarjeta {
+  background: #f8f9fa;
+  border-radius: 12px;
   padding: 1.25rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-left: 4px solid #007bff;
   transition: all 0.3s ease;
-  text-align: left;
+  flex-shrink: 0;
 }
 
-.graf-tarjeta:hover {
+.ba-tarjeta:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.graf-tarjeta-titulo {
+.ba-tarjeta-titulo {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #666;
+  color: #6c757d;
   margin: 0 0 0.5rem 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  line-height: 1.2;
 }
 
-.graf-tarjeta-valor {
+.ba-tarjeta-valor {
   font-size: 1.5rem;
   font-weight: 700;
   margin: 0;
-  color: #333;
+  color: #2c3e50;
+  line-height: 1.2;
 }
 
-/* ======================================== */
-/* 📊 SECCIÓN DEL GRÁFICO */
-/* ======================================== */
-
-.graf-chart-section {
+.ba-chart-section {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  min-height: 0;
 }
 
-.graf-chart-card {
+.ba-chart-card {
   background: #ffffff;
-  border-radius: 16px;
+  border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid #e9ecef;
   height: 100%;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
-.graf-chart-title {
-  font-size: 1rem;
+.ba-chart-title {
+  font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: #2c3e50;
   margin-bottom: 1rem;
   text-align: center;
+  line-height: 1.2;
 }
 
-/* CONTENEDOR PARA ESCRITORIO - Visible solo en escritorio */
-.grafico-container-desktop {
+.ba-grafico-container {
   position: relative;
   width: 100%;
-  height: 300px;
+  height: 250px;
   margin-bottom: 1rem;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 200px;
 }
 
-/* CONTENEDOR PARA MÓVILES - Visible solo en móviles */
-.grafico-container-mobile {
-  position: relative;
-  width: 100%;
-  height: 220px;
-  margin-bottom: 1rem;
+.ba-no-data {
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 100%;
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem;
 }
 
-/* ======================================== */
-/* 🎨 LEYENDAS Y TOOLTIP */
-/* ======================================== */
-
-.graf-tooltip {
+.ba-tooltip {
   background: white;
   border: 1px solid #e0e0e0;
-  padding: 8px 12px;
+  padding: 10px 14px;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.graf-tooltip-title {
+.ba-tooltip-title {
   font-weight: bold;
   margin: 0;
   color: #333;
   font-size: 0.9rem;
+  line-height: 1.2;
 }
 
-.graf-tooltip-value {
+.ba-tooltip-value {
   margin: 0;
   color: #666;
   font-size: 0.85rem;
+  line-height: 1.2;
 }
 
-.graf-legend-container {
+.ba-legend-container {
   display: flex;
   justify-content: center;
   gap: 1rem;
@@ -217,7 +202,7 @@
   flex-wrap: wrap;
 }
 
-.graf-legend-item {
+.ba-legend-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -225,152 +210,591 @@
   background: #f8f9fa;
   padding: 0.4rem 0.8rem;
   border-radius: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid #e9ecef;
+  line-height: 1;
 }
 
-.graf-legend-color {
+.ba-legend-color {
   width: 12px;
   height: 12px;
   border-radius: 50%;
   flex-shrink: 0;
 }
 
-.graf-legend-text {
+.ba-legend-text {
   white-space: nowrap;
   font-weight: 500;
   color: #555;
+  line-height: 1;
 }
 
-/* ======================================== */
-/* 📱 RESPONSIVE MEJORADO - CONTROL DE VISIBILIDAD */
-/* ======================================== */
-
-/* ESCRITORIO: Mostrar contenedor desktop, ocultar mobile */
-.grafico-container-mobile {
-  display: none;
-}
-
-.grafico-container-desktop {
-  display: flex;
-}
-
-/* MÓVILES: Mostrar contenedor mobile, ocultar desktop */
+/* Responsive específico */
 @media (max-width: 768px) {
-  .graf-container-main {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .graf-modal-content {
+  .ba-modal-content {
     width: 95%;
-    max-width: 400px;
-    padding: 1.5rem 1rem;
-    margin: 20px auto;
-    /* EN MÓVILES PERMITIMOS SCROLL SI ES NECESARIO */
-    overflow-y: auto;
+    max-width: 500px;
     max-height: 90vh;
+    overflow-y: auto;
+    padding: 1.5rem;
+    margin: 10px;
   }
 
-  .graf-tarjetas-section {
-    order: 2;
+  .ba-container-main {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    overflow: visible;
   }
 
-  .graf-chart-section {
-    order: 1;
-  }
-
-  .close-modal-x {
-    font-size: 1.5rem;
-    top: 8px;
-    right: 10px;
-  }
-
-  .graf-modal-title {
+  .ba-modal-title {
     font-size: 1.3rem;
-    margin-bottom: 1rem;
+    padding: 0 40px;
   }
 
-  .graf-tarjeta {
+  .ba-close-btn {
+    font-size: 1.8rem;
+    top: 10px;
+    right: 15px;
+  }
+
+  .ba-grafico-container {
+    height: 250px;
+  }
+
+  .ba-tarjeta {
     padding: 1rem;
   }
 
-  .graf-tarjeta-valor {
+  .ba-tarjeta-valor {
     font-size: 1.3rem;
-  }
-
-  /* EN MÓVILES: Cambiamos la visibilidad de los contenedores */
-  .grafico-container-mobile {
-    display: flex;
-    height: 200px;
-    min-height: 200px;
-  }
-
-  .grafico-container-desktop {
-    display: none;
-  }
-
-  .graf-legend-container {
-    gap: 0.5rem;
-  }
-
-  .graf-legend-item {
-    font-size: 0.75rem;
-    padding: 0.3rem 0.6rem;
   }
 }
 
 @media (max-width: 480px) {
-  .modal-overlay {
-    padding: 10px 0;
-    align-items: flex-start;
+  .ba-modal-overlay {
+    padding: 10px;
   }
 
-  .graf-modal-content {
-    width: 95%;
-    padding: 1.25rem 0.75rem;
-    max-width: 350px;
-    margin: 10px auto;
+  .ba-modal-content {
+    padding: 1.25rem;
+    border-radius: 16px;
+    max-height: 95vh;
   }
 
-  .graf-container-main {
-    gap: 0.75rem;
-  }
-
-  .graf-tarjeta {
-    padding: 0.875rem;
-  }
-
-  .graf-tarjeta-titulo {
-    font-size: 0.8rem;
-  }
-
-  .graf-tarjeta-valor {
+  .ba-modal-title {
     font-size: 1.2rem;
   }
 
-  .grafico-container-mobile {
-    height: 180px;
-    min-height: 180px;
+  .ba-grafico-container {
+    height: 200px;
+  }
+}
+
+/* Animaciones específicas */
+@keyframes ba-fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Prevenir scroll en body cuando modal está abierto - MÁS ROBUSTO */
+body.ba-modal-open {
+  overflow: hidden !important;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+html.ba-modal-open {
+  overflow: hidden !important;
+}
+/* ===== ESTILOS ESPECÍFICOS OPTIMIZADOS PARA BOTON ANALISIS REGISTROS ===== */
+
+.ba-modal-registros {
+  max-width: 1300px;
+  max-height: 75vh;
+  padding: 1.5rem;
+}
+
+/* CONTENEDOR PRINCIPAL DE 4 COLUMNAS */
+.ba-container-registros {
+  display: grid;
+  grid-template-columns: 180px 1fr 1fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+/* COLUMNA TOTAL COMPACTA */
+.ba-col-total {
+  display: flex;
+  flex-direction: column;
+}
+
+.ba-tarjeta-total-compact {
+  background: linear-gradient(135deg, #17a2b8, #138496);
+  color: white;
+  border-radius: 12px;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ba-tarjeta-total-compact .ba-tarjeta-titulo {
+  color: white;
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+
+.ba-total-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1;
+}
+
+.ba-total-label {
+  font-size: 0.8rem;
+  opacity: 0.9;
+  margin: 0;
+  margin-top: 0.25rem;
+}
+
+/* TARJETA DE GRÁFICO OPTIMIZADA */
+.ba-chart-card-registros {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 280px;
+}
+
+.ba-chart-card-registros .ba-chart-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  text-align: center;
+  color: #2c3e50;
+}
+
+/* CONTENEDOR GRÁFICO + LEYENDA */
+.ba-chart-with-legend {
+  display: flex;
+  gap: 0.75rem;
+  flex: 1;
+  min-height: 0;
+}
+
+/* GRÁFICO COMPACTO */
+.ba-grafico-container-compact {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* LISTA DE LEYENDAS COMPACTA */
+.ba-legend-list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 120px;
+  padding-right: 5px;
+}
+
+.ba-legend-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  font-size: 0.75rem;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.ba-legend-line:last-child {
+  border-bottom: none;
+}
+
+.ba-legend-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ba-legend-name {
+  flex: 1;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.7rem;
+}
+
+.ba-legend-count {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.75rem;
+  background: #f8f9fa;
+  padding: 0.1rem 0.4rem;
+  border-radius: 8px;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* SCROLL PERSONALIZADO */
+.ba-legend-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ba-legend-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+}
+
+.ba-legend-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 2px;
+}
+
+.ba-legend-list::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* RESPONSIVE OPTIMIZADO */
+@media (max-width: 1200px) {
+  .ba-container-registros {
+    grid-template-columns: 150px 1fr 1fr;
+    gap: 0.75rem;
   }
 
-  .graf-chart-card {
+  .ba-modal-registros {
+    max-width: 1000px;
+  }
+
+  .ba-tarjeta-total-compact {
+    padding: 1rem 0.75rem;
+  }
+
+  .ba-total-value {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .ba-container-registros {
+    grid-template-columns: 140px 1fr;
+  }
+
+  .ba-modal-registros {
+    max-width: 800px;
+    max-height: 80vh;
+  }
+
+  .ba-grafico-container-compact {
+    width: 100px;
+    height: 100px;
+  }
+
+  .ba-legend-list {
+    max-height: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ba-container-registros {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .ba-col-total {
+    order: -1;
+  }
+
+  .ba-tarjeta-total-compact {
+    padding: 1rem;
+    max-width: 200px;
+    margin: 0 auto;
+  }
+
+  .ba-chart-with-legend {
+    gap: 1rem;
+  }
+
+  .ba-grafico-container-compact {
+    width: 100px;
+    height: 100px;
+  }
+
+  .ba-legend-list {
+    max-height: 120px;
+  }
+
+  .ba-modal-registros {
+    padding: 1.25rem;
+    margin: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ba-modal-registros {
+    padding: 1rem;
+    max-height: 85vh;
+  }
+
+  .ba-chart-card-registros {
+    padding: 0.75rem;
+  }
+
+  .ba-chart-with-legend {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .ba-grafico-container-compact {
+    width: 120px;
+    height: 120px;
+  }
+
+  .ba-legend-list {
+    width: 100%;
+    max-height: 100px;
+  }
+
+  .ba-legend-line {
+    font-size: 0.8rem;
+  }
+}
+/* ===== ESTILOS ESPECÍFICOS OPTIMIZADOS PARA BOTON ANALISIS ASISTENCIA ===== */
+
+.ba-modal-asistencia {
+  max-width: 1400px;
+  max-height: 75vh;
+  padding: 1.5rem;
+}
+
+/* CONTENEDOR PRINCIPAL DE 5 COLUMNAS SIN RESUMEN */
+.ba-container-asistencia {
+  display: grid;
+  grid-template-columns: 160px repeat(4, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+/* COLUMNA TOTAL SOLO */
+.ba-col-total-solo {
+  display: flex;
+  flex-direction: column;
+}
+
+.ba-tarjeta-total-compact.bg-warning {
+  background: linear-gradient(135deg, #ffc107, #e0a800) !important;
+  color: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* TARJETA DE GRÁFICO ASISTENCIA MEJORADA */
+.ba-chart-card-asistencia {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1.25rem;
+  border: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 280px;
+  position: relative;
+}
+
+.ba-chart-card-asistencia .ba-chart-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  text-align: center;
+  color: #2c3e50;
+}
+
+/* BADGE DE PORCENTAJE */
+.ba-porcentaje-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: #0088fe;
+  color: white;
+  border-radius: 20px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 2;
+}
+
+/* CONTENIDO DEL GRÁFICO - ESTRUCTURA MEJORADA */
+.ba-chart-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 1rem;
+}
+
+/* GRÁFICO MÁS GRANDE */
+.ba-grafico-container-large {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* LEYENDA SIMPLE Y LIMPIA */
+.ba-legend-simple {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.ba-legend-item-simple {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+}
+
+.ba-legend-item-simple .ba-legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ba-legend-item-simple .ba-legend-text {
+  font-size: 0.8rem;
+  color: #555;
+  font-weight: 500;
+}
+
+/* RESPONSIVE OPTIMIZADO PARA ASISTENCIA */
+@media (max-width: 1400px) {
+  .ba-container-asistencia {
+    grid-template-columns: 150px repeat(4, 1fr);
+    gap: 0.75rem;
+  }
+
+  .ba-modal-asistencia {
+    max-width: 1200px;
+  }
+
+  .ba-grafico-container-large {
+    height: 150px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .ba-container-asistencia {
+    grid-template-columns: 140px repeat(3, 1fr);
+  }
+
+  .ba-modal-asistencia {
+    max-width: 1000px;
+  }
+
+  .ba-chart-card-asistencia {
     padding: 1rem;
   }
 }
 
-/* ======================================== */
-/* 🎨 COLORES */
-/* ======================================== */
+@media (max-width: 992px) {
+  .ba-container-asistencia {
+    grid-template-columns: 130px repeat(2, 1fr);
+  }
 
-.text-success {
-  color: #28a745 !important;
+  .ba-modal-asistencia {
+    max-width: 800px;
+    max-height: 80vh;
+  }
+
+  .ba-chart-card-asistencia {
+    min-height: 260px;
+  }
+
+  .ba-grafico-container-large {
+    height: 140px;
+  }
 }
-.text-primary {
-  color: #007bff !important;
+
+@media (max-width: 768px) {
+  .ba-container-asistencia {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .ba-col-total-solo {
+    order: -1;
+  }
+
+  .ba-tarjeta-total-compact {
+    max-width: 200px;
+    margin: 0 auto;
+  }
+
+  .ba-modal-asistencia {
+    padding: 1.25rem;
+    margin: 10px;
+  }
+
+  .ba-grafico-container-large {
+    height: 150px;
+  }
 }
-.text-warning {
-  color: #ffc107 !important;
+
+@media (max-width: 480px) {
+  .ba-modal-asistencia {
+    padding: 1rem;
+    max-height: 85vh;
+  }
+
+  .ba-chart-card-asistencia {
+    padding: 1rem;
+    min-height: 240px;
+  }
+
+  .ba-grafico-container-large {
+    height: 130px;
+  }
+
+  .ba-legend-item-simple .ba-legend-text {
+    font-size: 0.75rem;
+  }
 }
-.text-info {
-  color: #17a2b8 !important;
+/* EXPLICACIÓN DE ASISTENCIA */
+.ba-explicacion-asistencia {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #ffc107;
+  text-align: center;
+}
+
+.ba-explicacion-asistencia small {
+  font-size: 0.75rem;
+  line-height: 1.4;
 }

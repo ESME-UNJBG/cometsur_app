@@ -3,6 +3,7 @@ import Foor from "../Fuciones/footmod";
 import Qr from "../Fuciones/Qr";
 import Asistencia from "../Fuciones/Asistencia";
 import Foro from "../Btns/foro";
+import Asis from "../Fuciones/AsistenciaGrafico";
 /* import Cont from "./Fuciones/Cont"; */
 const Qrcode: React.FC = () => {
   return (
@@ -17,6 +18,7 @@ const Qrcode: React.FC = () => {
         }}
       >
         <Asistencia></Asistencia>
+        <Asis></Asis>
         <Foro></Foro>
       </div>
       <div
