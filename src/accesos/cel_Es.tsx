@@ -9,7 +9,7 @@ interface ComputadoraModalProps {
 interface Usuario {
   id: string;
   name: string;
-  asistencia?: number | null;
+  asistencia: number[]; // Cambiado a array para nuevo formato
 }
 
 const QR_REGION_ID = "html5qr-reader";
@@ -23,9 +23,17 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [sending, setSending] = useState<boolean>(false);
   const [overlayVisible, setOverlayVisible] = useState<boolean>(false);
+  const [selectedDay, setSelectedDay] = useState<1 | 2 | 3 | null>(null);
 
   const html5QrCodeRef = useRef<Html5Qrcode | null>(null);
   const usuariosRef = useRef<Usuario[]>([]);
+
+  // Mapeo de días a posiciones
+  const dayMapping = {
+    1: { morning: 0, afternoon: 1 },
+    2: { morning: 2, afternoon: 3 },
+    3: { morning: 4, afternoon: 5 },
+  };
 
   // Cargar usuarios desde localStorage
   useEffect(() => {
@@ -33,11 +41,19 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     if (stored) {
       try {
         const usuariosData: Usuario[] = JSON.parse(stored);
-        setUsuarios(usuariosData);
-        usuariosRef.current = usuariosData;
+        // Normalizar datos - asegurar que asistencia sea array de 6 elementos
+        const normalizedUsers = usuariosData.map((user) => ({
+          ...user,
+          asistencia: Array.isArray(user.asistencia)
+            ? user.asistencia
+            : [0, 0, 0, 0, 0, 0],
+        }));
+        setUsuarios(normalizedUsers);
+        usuariosRef.current = normalizedUsers;
       } catch {
-        setUsuarios([]);
-        usuariosRef.current = [];
+        const emptyUsers: Usuario[] = [];
+        setUsuarios(emptyUsers);
+        usuariosRef.current = emptyUsers;
       }
     }
   }, []);
@@ -120,10 +136,10 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     }
   }, [procesarQR, stopScanner]);
 
-  // Pasar asistencia
-  const handleAsistencia = async (num: number) => {
-    if (!usuarioEncontrado) {
-      setErrorMsg("No hay usuario seleccionado para pasar asistencia.");
+  // Pasar asistencia (NUEVO FORMATO)
+  const handleAsistencia = async (turno: "morning" | "afternoon") => {
+    if (!usuarioEncontrado || !selectedDay) {
+      setErrorMsg("No hay usuario seleccionado o día no definido.");
       return;
     }
 
@@ -133,6 +149,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
       return;
     }
 
+    const index = dayMapping[selectedDay][turno];
     const url = `https://cometsur-api.onrender.com/users/${usuarioEncontrado.id}`;
 
     try {
@@ -144,31 +161,44 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ asistencia: num }),
+        body: JSON.stringify({
+          index,
+          valor: 1, // Siempre 1 para marcar asistencia
+        }),
       });
 
       if (!res.ok) throw new Error(`Error en la petición: ${res.statusText}`);
 
-      const nuevos = usuarios.map((u) =>
-        u.id === usuarioEncontrado.id ? { ...u, asistencia: num } : u
-      );
+      // Actualizar lista local - modificar solo la posición específica
+      const nuevos = usuarios.map((u) => {
+        if (u.id === usuarioEncontrado.id) {
+          const newAsistencia = [...u.asistencia];
+          newAsistencia[index] = 1;
+          return { ...u, asistencia: newAsistencia };
+        }
+        return u;
+      });
+
       setUsuarios(nuevos);
       usuariosRef.current = nuevos;
       localStorage.setItem("usuarios", JSON.stringify(nuevos));
 
+      // Actualizar usuario encontrado con nuevos datos
       const actualizado = nuevos.find((u) => u.id === usuarioEncontrado.id);
       setUsuarioEncontrado(actualizado || null);
+
+      const turnoText = turno === "morning" ? "Mañana" : "Tarde";
       setSuccessMsg(
-        `✅ Asistencia ${num} guardada para ${usuarioEncontrado.name}`
+        `✅ Asistencia ${turnoText} (Día ${selectedDay}) guardada para ${usuarioEncontrado.name}`
       );
 
-      // Mostrar overlay actualizado con los datos nuevos
+      // Mostrar overlay actualizado
       setOverlayVisible(true);
 
-      // ⭐ MODIFICACIÓN: Resetear después de 0.5 segundos
+      // Resetear después de 0.5 segundos (manteniendo cámara activa)
       setTimeout(() => {
         setOverlayVisible(false);
-        setUsuarioEncontrado(null); // Esto hará que los botones desaparezcan y vuelvan a su estado inicial
+        setUsuarioEncontrado(null); // Permitir nuevo escaneo
       }, 500);
     } catch (err: unknown) {
       const message =
@@ -179,32 +209,100 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     }
   };
 
-  // Iniciar cámara al montar
+  // Iniciar cámara cuando se selecciona un día
   useEffect(() => {
-    startScanner();
+    if (selectedDay) {
+      startScanner();
+    }
     return () => {
-      stopScanner();
+      if (!selectedDay) {
+        stopScanner();
+      }
     };
-  }, [startScanner, stopScanner]);
+  }, [selectedDay, startScanner, stopScanner]);
 
+  // Resetear al cerrar
+  const handleClose = async () => {
+    await stopScanner();
+    onClose();
+  };
+
+  // Pantalla de selección de días
+  if (!selectedDay) {
+    return (
+      <div className="login-container card">
+        <div className="card-body">
+          {/* Header */}
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <div style={{ width: "33%" }} />
+            <div style={{ width: "33%", textAlign: "center" }}>
+              <p className="m-0 fw-bold">Seleccionar Día</p>
+            </div>
+            <div style={{ width: "33%", textAlign: "right" }}>
+              <button
+                type="button"
+                className="btn-close"
+                aria-label="Cerrar"
+                onClick={handleClose}
+              />
+            </div>
+          </div>
+
+          {/* Botones de días */}
+          <div className="d-flex flex-column gap-3">
+            {[1, 2, 3].map((day) => (
+              <button
+                key={day}
+                type="button"
+                className="btn btn-primary btn-lg"
+                onClick={() => setSelectedDay(day as 1 | 2 | 3)}
+                style={{
+                  padding: "15px",
+                  fontSize: "1.2rem",
+                  fontWeight: "bold",
+                }}
+              >
+                Día {day}
+              </button>
+            ))}
+          </div>
+
+          {errorMsg && (
+            <div className="alert alert-danger mt-3">{errorMsg}</div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Pantalla de cámara y asistencia
   return (
     <div className="login-container card">
       <div className="card-body">
         {/* Header */}
         <div className="d-flex justify-content-between align-items-center mb-3">
-          <div style={{ width: "33%" }} />
+          <div style={{ width: "33%" }}>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={() => {
+                setSelectedDay(null);
+                setUsuarioEncontrado(null);
+                setOverlayVisible(false);
+              }}
+            >
+              ← Volver
+            </button>
+          </div>
           <div style={{ width: "33%", textAlign: "center" }}>
-            <p className="m-0 fw-bold">Escanear QR</p>
+            <p className="m-0 fw-bold">Día {selectedDay} - Escanear QR</p>
           </div>
           <div style={{ width: "33%", textAlign: "right" }}>
             <button
               type="button"
               className="btn-close"
               aria-label="Cerrar"
-              onClick={async () => {
-                await stopScanner();
-                onClose();
-              }}
+              onClick={handleClose}
             />
           </div>
         </div>
@@ -244,37 +342,56 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
               <br />
               ID: {usuarioEncontrado.id}
               <br />
-              Asistencia actual: {usuarioEncontrado.asistencia ?? 0}
+              Día {selectedDay} seleccionado
             </div>
           )}
         </div>
 
-        {/* Botones de asistencia */}
+        {/* Botones de asistencia (Mañana/Tarde) - Solo cuando hay usuario escaneado */}
         {usuarioEncontrado && (
-          <div className="d-flex flex-wrap justify-content-center gap-2 mt-3">
-            {[1, 2, 3, 4, 5, 6].map((num) => (
-              <button
-                key={num}
-                type="button"
-                className="btn btn-primary flex-grow-1"
-                style={{
-                  minWidth: "120px",
-                  maxWidth: "200px",
-                  backgroundColor:
-                    usuarioEncontrado.asistencia === num - 1 ? "#28a745" : "",
-                }}
-                onClick={() => handleAsistencia(num)}
-                disabled={sending}
-              >
-                {sending ? "Actualizando..." : `Asistencia ${num}`}
-              </button>
-            ))}
+          <div className="d-flex flex-wrap justify-content-center gap-3 mt-3">
+            <button
+              type="button"
+              className="btn btn-success flex-grow-1"
+              style={{
+                minWidth: "140px",
+                padding: "12px",
+                fontSize: "1.1rem",
+              }}
+              onClick={() => handleAsistencia("morning")}
+              disabled={sending}
+            >
+              {sending ? "Actualizando..." : "🌅 Mañana"}
+            </button>
+
+            <button
+              type="button"
+              className="btn btn-warning flex-grow-1"
+              style={{
+                minWidth: "140px",
+                padding: "12px",
+                fontSize: "1.1rem",
+              }}
+              onClick={() => handleAsistencia("afternoon")}
+              disabled={sending}
+            >
+              {sending ? "Actualizando..." : "🌇 Tarde"}
+            </button>
           </div>
         )}
 
+        {/* Mensajes de estado */}
         {errorMsg && <div className="alert alert-danger mt-3">{errorMsg}</div>}
         {successMsg && (
           <div className="alert alert-success mt-3">{successMsg}</div>
+        )}
+
+        {/* Indicador de día seleccionado */}
+        {!usuarioEncontrado && (
+          <div className="alert alert-info mt-3">
+            <strong>Día {selectedDay} seleccionado</strong> - Escanea un código
+            QR para pasar asistencia
+          </div>
         )}
       </div>
 

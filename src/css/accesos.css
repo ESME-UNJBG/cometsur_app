@@ -204,3 +204,15 @@
   color: #ff3b30;
   transform: scale(1.1);
 }
+.table-scroll td {
+  text-align: center !important;
+  font-size: 1rem;
+}
+
+.table-scroll th {
+  text-align: center !important;
+}
+
+.asistencia-check {
+  font-size: 1.2rem;
+}

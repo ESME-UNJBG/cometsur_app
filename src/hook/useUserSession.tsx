@@ -5,7 +5,7 @@ export interface UserData {
   name: string;
   email: string;
   estado: string;
-  asistencia: number;
+  asistencia: number[]; // ✅ ahora es un array
   university: string;
   importe: string;
   category: string;
@@ -45,11 +45,13 @@ export const useUserSessionFull = (
 
       localStorage.setItem("userRole", data.estado);
       localStorage.setItem("userName", data.name);
-      localStorage.setItem("userAsistencia", data.asistencia.toString());
       localStorage.setItem("userEmail", data.email);
       localStorage.setItem("userUniversity", data.university);
       localStorage.setItem("userImporte", data.importe);
       localStorage.setItem("userCategory", data.category);
+
+      // ✅ Guardar asistencia como array en formato JSON
+      localStorage.setItem("userAsistencia", JSON.stringify(data.asistencia));
 
       previousUserData.current = data;
       window.dispatchEvent(new Event("storage"));
@@ -84,6 +86,11 @@ export const useUserSessionFull = (
         }
 
         const data: UserData = await res.json();
+
+        // ✅ Aseguramos que asistencia siempre sea un array
+        if (!Array.isArray(data.asistencia)) {
+          data.asistencia = [];
+        }
 
         // Solo actualizar el estado si hay cambios reales
         if (

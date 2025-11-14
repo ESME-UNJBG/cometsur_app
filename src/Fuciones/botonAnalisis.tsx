@@ -1,33 +1,23 @@
-// src/Funciones/BotonAnalisis.tsx
 import React, { useMemo, useState } from "react";
 import { User } from "../interfaces/user";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import "../css/graficos.css";
 
 interface BotonAnalisisProps {
   usuarios: User[];
 }
 
-const COLORS = [
-  "#0088FE",
-  "#00C49F",
-  "#FFBB28",
-  "#FF8042",
-  "#A020F0",
-  "#FF6384",
-  "#36A2EB",
-  "#4BC0C0",
-];
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
   const [showModal, setShowModal] = useState(false);
 
-  // Total Importe
+  // === CALCULOS ===
   const totalImporte = useMemo(
     () => usuarios.reduce((sum, u) => sum + (parseFloat(u.importe) || 0), 0),
     [usuarios]
   );
 
-  // Ingreso Yape
   const ingresoYape = useMemo(
     () =>
       usuarios
@@ -36,7 +26,6 @@ const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
     [usuarios]
   );
 
-  // Ingreso Físico
   const ingresoFisico = useMemo(
     () =>
       usuarios
@@ -45,85 +34,40 @@ const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
     [usuarios]
   );
 
-  // Contador de Otros
-  const contadorOtros = useMemo(
-    () => usuarios.filter((u) => u.pago === "Otro").length,
+  const ingresoOtros = useMemo(
+    () =>
+      usuarios
+        .filter((u) => u.pago === "Otro")
+        .reduce((sum, u) => sum + (parseFloat(u.importe) || 0), 0),
     [usuarios]
   );
 
-  // Datos por categoría
-  const dataCategorias = useMemo(() => {
-    const conteo: Record<string, number> = {};
-    usuarios.forEach((u) => {
-      conteo[u.category] = (conteo[u.category] || 0) + 1;
-    });
-    return Object.entries(conteo).map(([name, value]) => ({ name, value }));
-  }, [usuarios]);
-
-  // Datos por universidad
-  const dataUniversidades = useMemo(() => {
-    const conteo: Record<string, number> = {};
-    usuarios.forEach((u) => {
-      conteo[u.university] = (conteo[u.university] || 0) + 1;
-    });
-    return Object.entries(conteo).map(([name, value]) => ({ name, value }));
-  }, [usuarios]);
-
-  // Datos por profesión
-  const dataProfesiones = useMemo(() => {
-    const conteo: Record<string, number> = {};
-    usuarios.forEach((u) => {
-      conteo[u.profesion] = (conteo[u.profesion] || 0) + 1;
-    });
-    return Object.entries(conteo).map(([name, value]) => ({ name, value }));
-  }, [usuarios]);
-
-  // Totales para tooltips
-  const totalCategorias = dataCategorias.reduce((sum, d) => sum + d.value, 0);
-  const totalUniversidades = dataUniversidades.reduce(
-    (sum, d) => sum + d.value,
-    0
+  // === GRAFICO ===
+  const dataPagos = useMemo(
+    () => [
+      { name: "Yape", value: usuarios.filter((u) => u.pago === "Yape").length },
+      {
+        name: "Físico",
+        value: usuarios.filter((u) => u.pago === "Físico").length,
+      },
+      { name: "Otro", value: usuarios.filter((u) => u.pago === "Otro").length },
+    ],
+    [usuarios]
   );
-  const totalProfesiones = dataProfesiones.reduce((sum, d) => sum + d.value, 0);
 
-  const dataCategoriasWithTotal = dataCategorias.map((d) => ({
-    ...d,
-    total: totalCategorias,
-  }));
-  const dataUniversidadesWithTotal = dataUniversidades.map((d) => ({
-    ...d,
-    total: totalUniversidades,
-  }));
-  const dataProfesionesWithTotal = dataProfesiones.map((d) => ({
-    ...d,
-    total: totalProfesiones,
-  }));
-
-  // Tooltip personalizado
-  const CustomTooltip = ({
-    active,
-    payload,
-  }: {
+  // Tooltip tipado
+  interface TooltipProps {
     active?: boolean;
-    payload?: { payload: { name: string; value: number; total: number } }[];
-  }) => {
-    if (active && payload && payload.length) {
-      const { name, value, total } = payload[0].payload;
-      const percentage = ((value ?? 0) / (total ?? 1)) * 100;
+    payload?: { payload: { name: string; value: number } }[];
+  }
 
+  const CustomTooltip: React.FC<TooltipProps> = ({ active, payload }) => {
+    if (active && payload && payload.length > 0) {
+      const { name, value } = payload[0].payload;
       return (
-        <div
-          style={{
-            background: "#fff",
-            border: "1px solid #ccc",
-            padding: "5px 10px",
-            borderRadius: 4,
-          }}
-        >
-          <p style={{ margin: 0, fontSize: 12, fontWeight: "bold" }}>{name}</p>
-          <p style={{ margin: 0, fontSize: 12 }}>
-            {value} ({percentage.toFixed(1)}%)
-          </p>
+        <div className="graf-tooltip">
+          <p className="graf-tooltip-title">{name}</p>
+          <p className="graf-tooltip-value">{value} pagos</p>
         </div>
       );
     }
@@ -137,252 +81,131 @@ const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
         onClick={() => setShowModal(true)}
         disabled={usuarios.length === 0}
       >
-        📊 Análisis
+        📊 Análisis de Ingresos
       </button>
 
       {showModal && (
-        <div
-          className="modal fade show d-block"
-          tabIndex={-1}
-          style={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-          onClick={() => setShowModal(false)}
-        >
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
           <div
-            className="modal-dialog modal-lg modal-dialog-centered"
+            className="modal-content graf-modal-content"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="modal-content p-3">
-              <div className="modal-header">
-                <h5 className="modal-title fw-bold">
-                  📈 Análisis de Asistentes
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowModal(false)}
-                />
-              </div>
+            <button
+              className="close-modal-x"
+              onClick={() => setShowModal(false)}
+            >
+              ×
+            </button>
 
-              <div className="modal-body">
-                <div className="row text-center">
-                  {/* Columna 1: Total Importe y Desglose de Pagos (ESCALONADO) */}
-                  <div className="col-md-3 mb-3">
-                    {/* Total Importe */}
-                    <div className="card shadow-sm p-3 mb-2">
-                      <h6 className="fw-bold text-secondary">Total Importe</h6>
-                      <h4
-                        className="text-success fw-bold"
-                        style={{ fontSize: "1.2rem" }}
-                      >
-                        S/ {totalImporte.toFixed(2)}
-                      </h4>
-                    </div>
+            <h2 className="graf-modal-title">📈 Análisis de Ingresos</h2>
 
-                    {/* Ingreso Yape */}
-                    <div className="card shadow-sm p-2 mb-2">
-                      <h6 className="fw-bold text-secondary">Ingreso Yape</h6>
-                      <h5
-                        className="text-primary fw-bold"
-                        style={{ fontSize: "1.1rem" }}
-                      >
-                        S/ {ingresoYape.toFixed(2)}
-                      </h5>
-                      <small className="text-muted">
-                        {usuarios.filter((u) => u.pago === "Yape").length}{" "}
-                        transacciones
-                      </small>
-                    </div>
+            <div className="graf-container-main">
+              {/* COLUMNA IZQUIERDA - TARJETAS */}
+              <div className="graf-tarjetas-section">
+                <div className="graf-tarjeta">
+                  <h6 className="graf-tarjeta-titulo">Total Recaudado</h6>
+                  <h4 className="graf-tarjeta-valor text-success">
+                    S/ {totalImporte.toFixed(2)}
+                  </h4>
+                </div>
 
-                    {/* Ingreso Físico */}
-                    <div className="card shadow-sm p-2 mb-2">
-                      <h6 className="fw-bold text-secondary">Ingreso Físico</h6>
-                      <h5
-                        className="text-warning fw-bold"
-                        style={{ fontSize: "1.1rem" }}
-                      >
-                        S/ {ingresoFisico.toFixed(2)}
-                      </h5>
-                      <small className="text-muted">
-                        {usuarios.filter((u) => u.pago === "Físico").length}{" "}
-                        transacciones
-                      </small>
-                    </div>
+                <div className="graf-tarjeta">
+                  <h6 className="graf-tarjeta-titulo">Ingreso Yape</h6>
+                  <h4 className="graf-tarjeta-valor text-primary">
+                    S/ {ingresoYape.toFixed(2)}
+                  </h4>
+                </div>
 
-                    {/* Ingreso Otros */}
-                    <div className="card shadow-sm p-2">
-                      <h6 className="fw-bold text-secondary">Ingreso Otros</h6>
-                      <h5
-                        className="text-info fw-bold"
-                        style={{ fontSize: "1.1rem" }}
-                      >
-                        {contadorOtros}
-                      </h5>
-                      <small className="text-muted">
-                        registros con método "Otro"
-                      </small>
-                    </div>
-                  </div>
+                <div className="graf-tarjeta">
+                  <h6 className="graf-tarjeta-titulo">Ingreso Físico</h6>
+                  <h4 className="graf-tarjeta-valor text-warning">
+                    S/ {ingresoFisico.toFixed(2)}
+                  </h4>
+                </div>
 
-                  {/* Columna 2: Por Profesión */}
-                  <div className="col-md-3 mb-3">
-                    <div className="card shadow-sm p-2">
-                      <h6 className="fw-bold text-secondary">Por Profesión</h6>
-                      <ResponsiveContainer width="100%" height={180}>
-                        <PieChart>
-                          <Pie
-                            data={dataProfesionesWithTotal}
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={60}
-                            dataKey="value"
-                          >
-                            {dataProfesionesWithTotal.map((_, index) => (
-                              <Cell
-                                key={`prof-${index}`}
-                                fill={COLORS[index % COLORS.length]}
-                              />
-                            ))}
-                          </Pie>
-                          <Tooltip content={<CustomTooltip />} />
-                        </PieChart>
-                      </ResponsiveContainer>
-                      <div className="mt-2 d-flex flex-wrap justify-content-center">
-                        {dataProfesionesWithTotal.map((d, index) => (
-                          <div
-                            key={`legend-prof-${index}`}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              marginRight: 10,
-                              fontSize: 12,
-                            }}
-                          >
-                            <div
-                              style={{
-                                width: 12,
-                                height: 12,
-                                backgroundColor: COLORS[index % COLORS.length],
-                                marginRight: 4,
-                              }}
-                            />
-                            {d.name}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Columna 3: Por Categoría */}
-                  <div className="col-md-3 mb-3">
-                    <div className="card shadow-sm p-2">
-                      <h6 className="fw-bold text-secondary">Por Categoría</h6>
-                      <ResponsiveContainer width="100%" height={180}>
-                        <PieChart>
-                          <Pie
-                            data={dataCategoriasWithTotal}
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={60}
-                            dataKey="value"
-                          >
-                            {dataCategoriasWithTotal.map((_, index) => (
-                              <Cell
-                                key={`cat-${index}`}
-                                fill={COLORS[index % COLORS.length]}
-                              />
-                            ))}
-                          </Pie>
-                          <Tooltip content={<CustomTooltip />} />
-                        </PieChart>
-                      </ResponsiveContainer>
-                      <div className="mt-2 d-flex flex-wrap justify-content-center">
-                        {dataCategoriasWithTotal.map((d, index) => (
-                          <div
-                            key={`legend-cat-${index}`}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              marginRight: 10,
-                              fontSize: 12,
-                            }}
-                          >
-                            <div
-                              style={{
-                                width: 12,
-                                height: 12,
-                                backgroundColor: COLORS[index % COLORS.length],
-                                marginRight: 4,
-                              }}
-                            />
-                            {d.name}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Columna 4: Por Universidad */}
-                  <div className="col-md-3 mb-3">
-                    <div className="card shadow-sm p-2">
-                      <h6 className="fw-bold text-secondary">
-                        Por Universidad
-                      </h6>
-                      <ResponsiveContainer width="100%" height={180}>
-                        <PieChart>
-                          <Pie
-                            data={dataUniversidadesWithTotal}
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={60}
-                            dataKey="value"
-                          >
-                            {dataUniversidadesWithTotal.map((_, index) => (
-                              <Cell
-                                key={`uni-${index}`}
-                                fill={COLORS[index % COLORS.length]}
-                              />
-                            ))}
-                          </Pie>
-                          <Tooltip content={<CustomTooltip />} />
-                        </PieChart>
-                      </ResponsiveContainer>
-                      <div className="mt-2 d-flex flex-wrap justify-content-center">
-                        {dataUniversidadesWithTotal.map((d, index) => (
-                          <div
-                            key={`legend-uni-${index}`}
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              marginRight: 10,
-                              fontSize: 12,
-                            }}
-                          >
-                            <div
-                              style={{
-                                width: 12,
-                                height: 12,
-                                backgroundColor: COLORS[index % COLORS.length],
-                                marginRight: 4,
-                              }}
-                            />
-                            {d.name}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                <div className="graf-tarjeta">
+                  <h6 className="graf-tarjeta-titulo">Otros Métodos</h6>
+                  <h4 className="graf-tarjeta-valor text-info">
+                    S/ {ingresoOtros.toFixed(2)}
+                  </h4>
                 </div>
               </div>
 
-              <div className="modal-footer">
-                <button
-                  className="btn btn-secondary btn-sm"
-                  onClick={() => setShowModal(false)}
-                >
-                  Cerrar
-                </button>
+              {/* COLUMNA DERECHA - GRÁFICO */}
+              <div className="graf-chart-section">
+                <div className="graf-chart-card">
+                  <h6 className="graf-chart-title">Métodos de Pago</h6>
+
+                  {/* CONTENEDOR DEL GRÁFICO - VISIBLE SOLO EN ESCRITORIO */}
+                  <div className="grafico-container-desktop">
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          data={dataPagos}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={100}
+                          innerRadius={50}
+                          paddingAngle={2}
+                          dataKey="value"
+                        >
+                          {dataPagos.map((_, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip content={<CustomTooltip />} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* CONTENEDOR DEL GRÁFICO - VISIBLE SOLO EN MÓVILES */}
+                  <div className="grafico-container-mobile">
+                    <ResponsiveContainer width="100%" height={220}>
+                      <PieChart>
+                        <Pie
+                          data={dataPagos}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={80}
+                          innerRadius={40}
+                          paddingAngle={2}
+                          dataKey="value"
+                        >
+                          {dataPagos.map((_, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip content={<CustomTooltip />} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div className="graf-legend-container">
+                    {dataPagos.map((d, index) => (
+                      <div key={`legend-${index}`} className="graf-legend-item">
+                        <div
+                          className="graf-legend-color"
+                          style={{
+                            backgroundColor: COLORS[index % COLORS.length],
+                          }}
+                        />
+                        <span className="graf-legend-text">
+                          {d.name} ({d.value})
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
+
+            {/* ELIMINAMOS EL FOOTER CON EL BOTÓN CERRAR */}
           </div>
         </div>
       )}

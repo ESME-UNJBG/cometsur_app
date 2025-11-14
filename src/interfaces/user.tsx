@@ -4,7 +4,7 @@ export interface User {
   email: string;
   name: string;
   estado: string;
-  asistencia: number;
+  asistencia?: number[];
   university: string;
   importe: string;
   category: string;

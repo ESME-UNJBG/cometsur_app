@@ -1,0 +1,376 @@
+/* ======================================== */
+/* 🪟 MODAL PRINCIPAL - Sin scroll en desktop */
+/* ======================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  animation: fadeInOverlay 0.3s ease forwards;
+  padding: 20px 0;
+}
+
+.graf-modal-content {
+  background-color: #ffffff !important;
+  opacity: 1 !important;
+  border-radius: 32px !important;
+  padding: 2rem 1.5rem 1.5rem 1.5rem !important;
+  width: 90%;
+  max-width: 800px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
+  position: relative;
+  z-index: 10000;
+  border: 0.5px solid rgba(0, 0, 0, 0.06);
+  text-align: center;
+  animation: fadeIn 0.3s ease;
+  margin: auto;
+  /* ELIMINAMOS EL SCROLL EN DESKTOP */
+  overflow: hidden;
+  max-height: calc(100vh - 40px);
+}
+
+@keyframes fadeInOverlay {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.close-modal-x {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 1.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s ease, transform 0.2s ease;
+  z-index: 10001;
+}
+
+.close-modal-x:hover {
+  color: #000;
+  transform: scale(1.1);
+}
+
+/* ======================================== */
+/* 🏗️ ESTRUCTURA PRINCIPAL */
+/* ======================================== */
+
+.graf-container-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+  margin: 1.5rem 0;
+}
+
+.graf-modal-title {
+  color: #333;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+/* ======================================== */
+/* 💳 TARJETAS DE INGRESOS */
+/* ======================================== */
+
+.graf-tarjetas-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.graf-tarjeta {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.graf-tarjeta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+}
+
+.graf-tarjeta-titulo {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #666;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.graf-tarjeta-valor {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: #333;
+}
+
+/* ======================================== */
+/* 📊 SECCIÓN DEL GRÁFICO */
+/* ======================================== */
+
+.graf-chart-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.graf-chart-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.graf-chart-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* CONTENEDOR PARA ESCRITORIO - Visible solo en escritorio */
+.grafico-container-desktop {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* CONTENEDOR PARA MÓVILES - Visible solo en móviles */
+.grafico-container-mobile {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ======================================== */
+/* 🎨 LEYENDAS Y TOOLTIP */
+/* ======================================== */
+
+.graf-tooltip {
+  background: white;
+  border: 1px solid #e0e0e0;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.graf-tooltip-title {
+  font-weight: bold;
+  margin: 0;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.graf-tooltip-value {
+  margin: 0;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.graf-legend-container {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.graf-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  background: #f8f9fa;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.graf-legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.graf-legend-text {
+  white-space: nowrap;
+  font-weight: 500;
+  color: #555;
+}
+
+/* ======================================== */
+/* 📱 RESPONSIVE MEJORADO - CONTROL DE VISIBILIDAD */
+/* ======================================== */
+
+/* ESCRITORIO: Mostrar contenedor desktop, ocultar mobile */
+.grafico-container-mobile {
+  display: none;
+}
+
+.grafico-container-desktop {
+  display: flex;
+}
+
+/* MÓVILES: Mostrar contenedor mobile, ocultar desktop */
+@media (max-width: 768px) {
+  .graf-container-main {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .graf-modal-content {
+    width: 95%;
+    max-width: 400px;
+    padding: 1.5rem 1rem;
+    margin: 20px auto;
+    /* EN MÓVILES PERMITIMOS SCROLL SI ES NECESARIO */
+    overflow-y: auto;
+    max-height: 90vh;
+  }
+
+  .graf-tarjetas-section {
+    order: 2;
+  }
+
+  .graf-chart-section {
+    order: 1;
+  }
+
+  .close-modal-x {
+    font-size: 1.5rem;
+    top: 8px;
+    right: 10px;
+  }
+
+  .graf-modal-title {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+
+  .graf-tarjeta {
+    padding: 1rem;
+  }
+
+  .graf-tarjeta-valor {
+    font-size: 1.3rem;
+  }
+
+  /* EN MÓVILES: Cambiamos la visibilidad de los contenedores */
+  .grafico-container-mobile {
+    display: flex;
+    height: 200px;
+    min-height: 200px;
+  }
+
+  .grafico-container-desktop {
+    display: none;
+  }
+
+  .graf-legend-container {
+    gap: 0.5rem;
+  }
+
+  .graf-legend-item {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 10px 0;
+    align-items: flex-start;
+  }
+
+  .graf-modal-content {
+    width: 95%;
+    padding: 1.25rem 0.75rem;
+    max-width: 350px;
+    margin: 10px auto;
+  }
+
+  .graf-container-main {
+    gap: 0.75rem;
+  }
+
+  .graf-tarjeta {
+    padding: 0.875rem;
+  }
+
+  .graf-tarjeta-titulo {
+    font-size: 0.8rem;
+  }
+
+  .graf-tarjeta-valor {
+    font-size: 1.2rem;
+  }
+
+  .grafico-container-mobile {
+    height: 180px;
+    min-height: 180px;
+  }
+
+  .graf-chart-card {
+    padding: 1rem;
+  }
+}
+
+/* ======================================== */
+/* 🎨 COLORES */
+/* ======================================== */
+
+.text-success {
+  color: #28a745 !important;
+}
+.text-primary {
+  color: #007bff !important;
+}
+.text-warning {
+  color: #ffc107 !important;
+}
+.text-info {
+  color: #17a2b8 !important;
+}
