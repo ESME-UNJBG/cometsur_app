@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import "../css/Ventana.css";
-
+import "../css/bt_esca.css";
 interface ComputadoraModalProps {
   onClose: () => void;
 }
@@ -236,7 +236,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
           <div className="d-flex justify-content-between align-items-center mb-4">
             <div style={{ width: "33%" }} />
             <div style={{ width: "33%", textAlign: "center" }}>
-              <p className="m-0 fw-bold">Seleccionar Día</p>
+              <p className="m-0 fw-bold modal-title">Seleccionar Día</p>
             </div>
             <div style={{ width: "33%", textAlign: "right" }}>
               <button
@@ -248,23 +248,47 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
             </div>
           </div>
 
-          {/* Botones de días */}
+          {/* Mensaje instructivo */}
+          <div className="text-center mb-4">
+            <p className="text-muted instruction-text">
+              Elige el día para pasar asistencia
+            </p>
+          </div>
+
+          {/* Botones de días - Estilo Material Design */}
           <div className="d-flex flex-column gap-3">
-            {[1, 2, 3].map((day) => (
-              <button
-                key={day}
-                type="button"
-                className="btn btn-primary btn-lg"
-                onClick={() => setSelectedDay(day as 1 | 2 | 3)}
-                style={{
-                  padding: "15px",
-                  fontSize: "1.2rem",
-                  fontWeight: "bold",
-                }}
-              >
-                Día {day}
-              </button>
-            ))}
+            {/* Día 1 */}
+            <button
+              type="button"
+              className="btn day-btn-material day-1-material"
+              onClick={() => setSelectedDay(1)}
+            >
+              <div className="day-content">
+                <span className="day-text-material">Día 1</span>
+              </div>
+            </button>
+
+            {/* Día 2 */}
+            <button
+              type="button"
+              className="btn day-btn-material day-2-material"
+              onClick={() => setSelectedDay(2)}
+            >
+              <div className="day-content">
+                <span className="day-text-material">Día 2</span>
+              </div>
+            </button>
+
+            {/* Día 3 */}
+            <button
+              type="button"
+              className="btn day-btn-material day-3-material"
+              onClick={() => setSelectedDay(3)}
+            >
+              <div className="day-content">
+                <span className="day-text-material">Día 3</span>
+              </div>
+            </button>
           </div>
 
           {errorMsg && (
@@ -340,12 +364,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
           <div className="d-flex flex-wrap justify-content-center gap-3 mt-3">
             <button
               type="button"
-              className="btn btn-success flex-grow-1"
-              style={{
-                minWidth: "140px",
-                padding: "12px",
-                fontSize: "1.1rem",
-              }}
+              className="btn asistencia-btn-morning flex-grow-1"
               onClick={() => handleAsistencia("morning")}
               disabled={sending}
             >
@@ -354,12 +373,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
 
             <button
               type="button"
-              className="btn btn-warning flex-grow-1"
-              style={{
-                minWidth: "140px",
-                padding: "12px",
-                fontSize: "1.1rem",
-              }}
+              className="btn asistencia-btn-afternoon flex-grow-1"
               onClick={() => handleAsistencia("afternoon")}
               disabled={sending}
             >
@@ -367,7 +381,6 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
             </button>
           </div>
         )}
-
         {/* Mensajes de estado */}
         {errorMsg && <div className="alert alert-danger mt-3">{errorMsg}</div>}
         {successMsg && (

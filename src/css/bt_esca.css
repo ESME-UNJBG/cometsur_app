@@ -1,0 +1,184 @@
+/* computadora-modal.css - Estilos Material Design para botones de días */
+
+.day-btn-material {
+  position: relative;
+  padding: 25px 15px;
+  border: none;
+  border-radius: 15px; /* Material design usa bordes menos redondeados */
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+  width: 100%;
+  cursor: pointer;
+
+  /* Sombras para profundidad - Nivel 2 */
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+    0 1px 10px 0 rgba(0, 0, 0, 0.12);
+}
+
+.day-btn-material:hover {
+  transform: translateY(-4px);
+  /* Sombras más elevadas al hover - Nivel 4 */
+  box-shadow: 0 6px 10px -1px rgba(0, 0, 0, 0.2),
+    0 10px 14px 0 rgba(0, 0, 0, 0.14), 0 4px 18px 0 rgba(0, 0, 0, 0.12);
+}
+
+.day-btn-material:active {
+  transform: translateY(-1px);
+  /* Sombras menos elevadas al active - Nivel 1 */
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 2px 1px -1px rgba(0, 0, 0, 0.14),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.day-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Día 1 - Azul Material */
+.day-1-material {
+  background-color: #2196f3; /* Blue 500 */
+  border: none;
+}
+
+.day-1-material:hover {
+  background-color: #1976d2; /* Blue 700 */
+}
+
+/* Día 2 - Verde Material */
+.day-2-material {
+  background-color: #4caf50; /* Green 500 */
+  border: none;
+}
+
+.day-2-material:hover {
+  background-color: #388e3c; /* Green 700 */
+}
+
+/* Día 3 - Naranja Material */
+.day-3-material {
+  background-color: #ff9800; /* Orange 500 */
+  border: none;
+}
+
+.day-3-material:hover {
+  background-color: #f57c00; /* Orange 700 */
+}
+
+.day-number-material {
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.95;
+}
+
+.day-text-material {
+  font-size: 1.3rem;
+  font-weight: 600;
+  opacity: 0.9;
+  letter-spacing: 0.5px;
+}
+
+/* Efecto de ripple (opcional, pero típico en Material Design) */
+.day-btn-material {
+  position: relative;
+  overflow: hidden;
+}
+
+.day-btn-material::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.day-btn-material:active::after {
+  width: 100px;
+  height: 100px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .day-btn-material {
+    padding: 20px 12px;
+    min-height: 85px;
+  }
+
+  .day-number-material {
+    font-size: 2.2rem;
+  }
+
+  .day-text-material {
+    font-size: 1.1rem;
+  }
+}
+
+/* Para tablets */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .day-btn-material {
+    padding: 30px 20px;
+    min-height: 120px;
+  }
+
+  .day-number-material {
+    font-size: 3.2rem;
+  }
+
+  .day-text-material {
+    font-size: 1.5rem;
+  }
+}
+
+/* Estilos para los botones Mañana/Tarde en la pantalla de cámara - Material Design */
+.asistencia-btn-morning {
+  background-color: #4caf50; /* Green 500 */
+  border: none;
+  color: white;
+  min-width: 140px;
+  padding: 12px;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+    0 1px 10px 0 rgba(0, 0, 0, 0.12);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.asistencia-btn-afternoon {
+  background-color: #ff9800; /* Orange 500 */
+  border: none;
+  color: white;
+  min-width: 140px;
+  padding: 12px;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2), 0 4px 5px 0 rgba(0, 0, 0, 0.14),
+    0 1px 10px 0 rgba(0, 0, 0, 0.12);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.asistencia-btn-morning:hover,
+.asistencia-btn-afternoon:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px -1px rgba(0, 0, 0, 0.2),
+    0 6px 10px 0 rgba(0, 0, 0, 0.14), 0 2px 16px 0 rgba(0, 0, 0, 0.12);
+}
+
+.asistencia-btn-morning:active,
+.asistencia-btn-afternoon:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2), 0 2px 1px -1px rgba(0, 0, 0, 0.14),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
