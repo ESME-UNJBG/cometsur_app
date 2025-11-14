@@ -83,15 +83,6 @@ const AnalisisGrafico: React.FC = () => {
     <div className="card mb-4">
       <div className="card-body">
         {/* ENCABEZADO */}
-        <div className="text-center mb-4 pb-3 border-bottom">
-          {/*<h4 className="card-title fw-bold mb-2">📊 Análisis General</h4>*/}
-          <p className="card-text text-muted mb-2">
-            Estadísticas y métricas de los datos del sistema
-          </p>
-          {/*<small className="text-muted">
-            Total de usuarios: <strong>{usuarios.length}</strong>
-          </small>*/}
-        </div>
 
         {/* CONTENEDOR DE BOTONES */}
         <div className="row g-3 justify-content-center">
