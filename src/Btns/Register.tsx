@@ -203,7 +203,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     else if (name === "baucher")
       setFormData((prev) => ({ ...prev, baucher: value.toUpperCase() }));
     else if (name === "email") {
-      const lower = value.toLowerCase();
+      const lower = value;
       setFormData((prev) => ({ ...prev, email: lower }));
       if (lower.includes("@")) {
         const afterAt = lower.split("@")[1] || "";
