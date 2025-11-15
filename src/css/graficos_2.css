@@ -1,0 +1,321 @@
+/* ===== ESTILOS ESPECÍFICOS OPTIMIZADOS PARA BOTON ANALISIS ASISTENCIA ===== */
+
+.ba-modal-asistencia {
+  max-width: 1400px;
+  max-height: 80vh; /* Aumentado */
+  padding: 1.5rem;
+}
+
+/* CONTENEDOR PRINCIPAL DE 5 COLUMNAS SIN RESUMEN */
+.ba-container-asistencia {
+  display: grid;
+  grid-template-columns: 160px repeat(4, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+/* COLUMNA TOTAL SOLO */
+.ba-col-total-solo {
+  display: flex;
+  flex-direction: column;
+}
+
+.ba-tarjeta-total-compact.bg-warning {
+  background: linear-gradient(135deg, #ffc107, #e0a800) !important;
+  color: white;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.ba-tarjeta-total-compact .ba-tarjeta-titulo {
+  color: white;
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+
+.ba-total-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1;
+}
+
+.ba-total-label {
+  font-size: 0.8rem;
+  opacity: 0.9;
+  margin: 0;
+  margin-top: 0.25rem;
+}
+
+/* TARJETA DE GRÁFICO ASISTENCIA - ESTRUCTURA COMPACTA COMO REGISTROS */
+.ba-chart-card-asistencia {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1rem;
+  border: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 280px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ba-chart-card-asistencia .ba-chart-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  text-align: center;
+  color: #2c3e50;
+}
+
+/* BADGE DE PORCENTAJE */
+.ba-porcentaje-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: #0088fe;
+  color: white;
+  border-radius: 20px;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 2;
+}
+
+/* ESTRUCTURA COMPACTA - GRÁFICO + LEYENDA EN LÍNEA */
+.ba-chart-with-legend {
+  display: flex;
+  flex-direction: column; /* 🔥 Mueve la leyenda abajo SIEMPRE */
+  gap: 0.75rem;
+  flex: 1;
+  min-height: 0;
+  align-items: center;
+}
+
+/* GRÁFICO COMPACTO */
+.ba-grafico-container-compact {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* LISTA DE LEYENDAS COMPACTA */
+.ba-legend-list {
+  flex: 1;
+  overflow-y: auto;
+  max-width: 120px;
+  padding-right: 5px;
+}
+
+.ba-legend-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  font-size: 0.75rem;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.ba-legend-line:last-child {
+  border-bottom: none;
+}
+
+.ba-legend-color {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ba-legend-name {
+  flex: 1;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.7rem;
+}
+
+.ba-legend-count {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.75rem;
+  background: #f8f9fa;
+  padding: 0.1rem 0.4rem;
+  border-radius: 8px;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* SCROLL PERSONALIZADO */
+.ba-legend-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ba-legend-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 2px;
+}
+
+.ba-legend-list::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 2px;
+}
+
+.ba-legend-list::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.ba-no-data {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  padding: 1.5rem;
+  word-wrap: break-word;
+}
+
+/* RESPONSIVE OPTIMIZADO - SIGUIENDO PATRÓN REGISTROS */
+@media (max-width: 1400px) {
+  .ba-container-asistencia {
+    grid-template-columns: 150px repeat(4, 1fr);
+    gap: 0.75rem;
+  }
+
+  .ba-modal-asistencia {
+    max-width: 1200px;
+  }
+
+  .ba-tarjeta-total-compact {
+    padding: 1rem 0.75rem;
+  }
+
+  .ba-total-value {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 1200px) {
+  .ba-container-asistencia {
+    grid-template-columns: 140px repeat(3, 1fr);
+  }
+
+  .ba-modal-asistencia {
+    max-width: 1000px;
+  }
+
+  .ba-chart-card-asistencia {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .ba-container-asistencia {
+    grid-template-columns: 130px repeat(2, 1fr);
+  }
+
+  .ba-modal-asistencia {
+    max-width: 800px;
+    max-height: 85vh;
+  }
+
+  .ba-grafico-container-compact {
+    width: 100px;
+    height: 100px;
+  }
+
+  .ba-legend-list {
+    max-height: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ba-container-asistencia {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .ba-col-total-solo {
+    order: -1;
+  }
+
+  .ba-tarjeta-total-compact {
+    padding: 1rem;
+    max-width: 200px;
+    margin: 0 auto;
+  }
+
+  .ba-chart-with-legend {
+    gap: 1rem;
+  }
+
+  .ba-grafico-container-compact {
+    width: 100px;
+    height: 100px;
+  }
+
+  .ba-legend-list {
+    max-height: 120px;
+  }
+
+  .ba-modal-asistencia {
+    padding: 1.25rem;
+    margin: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ba-modal-asistencia {
+    padding: 1rem;
+    max-height: 90vh;
+  }
+
+  .ba-chart-card-asistencia {
+    padding: 0.75rem;
+  }
+
+  .ba-chart-with-legend {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .ba-grafico-container-compact {
+    width: 120px;
+    height: 120px;
+  }
+
+  .ba-legend-list {
+    width: 100%;
+    max-height: 100px;
+  }
+
+  .ba-legend-line {
+    font-size: 0.8rem;
+  }
+}
+
+/* EXPLICACIÓN DE ASISTENCIA */
+.ba-explicacion-asistencia {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #ffc107;
+  text-align: center;
+}
+
+.ba-explicacion-asistencia small {
+  font-size: 0.75rem;
+  line-height: 1.4;
+}

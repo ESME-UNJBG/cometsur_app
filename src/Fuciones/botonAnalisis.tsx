@@ -16,7 +16,7 @@ const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
   // Estilos en línea para el botón vino
   const buttonStyle = {
     border: "none",
-    borderRadius: "20px", // Más redondeado
+    borderRadius: "20px",
     padding: "0.5rem 1.5rem",
     color: "#fff",
     fontWeight: 600,
@@ -38,7 +38,6 @@ const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
   useEffect(() => {
     if (showModal) {
       document.body.classList.add("ba-modal-open");
-      // Prevenir cualquier scroll del parent
       document.documentElement.style.overflow = "hidden";
     } else {
       document.body.classList.remove("ba-modal-open");
@@ -73,11 +72,9 @@ const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
     [usuarios]
   );
 
-  const ingresoOtros = useMemo(
-    () =>
-      usuarios
-        .filter((u) => u.pago === "Otro")
-        .reduce((sum, u) => sum + (parseFloat(u.importe) || 0), 0),
+  // Contador de usuarios con pago "Otro"
+  const cantidadOtros = useMemo(
+    () => usuarios.filter((u) => u.pago === "Otro").length,
     [usuarios]
   );
 
@@ -173,60 +170,62 @@ const BotonAnalisis: React.FC<BotonAnalisisProps> = ({ usuarios }) => {
                 <div className="ba-tarjeta">
                   <h6 className="ba-tarjeta-titulo">Otros Métodos</h6>
                   <h4 className="ba-tarjeta-valor text-info">
-                    S/ {ingresoOtros.toFixed(2)}
+                    {cantidadOtros} usuarios
                   </h4>
                 </div>
               </div>
 
-              {/* COLUMNA DERECHA - GRÁFICO */}
+              {/* COLUMNA DERECHA - GRÁFICO CON ESTRUCTURA COMPACTA (COMO REGISTROS) */}
               <div className="ba-chart-section">
                 <div className="ba-chart-card">
                   <h6 className="ba-chart-title">Métodos de Pago</h6>
 
-                  <div className="ba-grafico-container">
-                    {dataPagos.some((item) => item.value > 0) ? (
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={dataPagos}
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={80}
-                            innerRadius={35}
-                            paddingAngle={2}
-                            dataKey="value"
-                          >
-                            {dataPagos.map((_, index) => (
-                              <Cell
-                                key={`cell-${index}`}
-                                fill={COLORS[index % COLORS.length]}
-                              />
-                            ))}
-                          </Pie>
-                          <Tooltip content={<CustomTooltip />} />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    ) : (
-                      <div className="ba-no-data">
-                        No hay datos para mostrar el gráfico
-                      </div>
-                    )}
-                  </div>
+                  {/* ESTRUCTURA COMPACTA - GRÁFICO + LEYENDA EN LÍNEA */}
+                  <div className="ba-chart-with-legend">
+                    {/* GRÁFICO COMPACTO */}
+                    <div className="ba-grafico-container-compact">
+                      {dataPagos.some((item) => item.value > 0) ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={dataPagos}
+                              cx="50%"
+                              cy="50%"
+                              outerRadius={60} // Ajustado para tamaño compacto
+                              innerRadius={25}
+                              paddingAngle={1}
+                              dataKey="value"
+                            >
+                              {dataPagos.map((_, index) => (
+                                <Cell
+                                  key={`cell-${index}`}
+                                  fill={COLORS[index % COLORS.length]}
+                                />
+                              ))}
+                            </Pie>
+                            <Tooltip content={<CustomTooltip />} />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <div className="ba-no-data">Sin datos</div>
+                      )}
+                    </div>
 
-                  <div className="ba-legend-container">
-                    {dataPagos.map((d, index) => (
-                      <div key={`legend-${index}`} className="ba-legend-item">
-                        <div
-                          className="ba-legend-color"
-                          style={{
-                            backgroundColor: COLORS[index % COLORS.length],
-                          }}
-                        />
-                        <span className="ba-legend-text">
-                          {d.name} ({d.value})
-                        </span>
-                      </div>
-                    ))}
+                    {/* LISTA DE LEYENDAS COMPACTA */}
+                    <div className="ba-legend-list">
+                      {dataPagos.map((d, index) => (
+                        <div key={`legend-${index}`} className="ba-legend-line">
+                          <div
+                            className="ba-legend-color"
+                            style={{
+                              backgroundColor: COLORS[index % COLORS.length],
+                            }}
+                          />
+                          <span className="ba-legend-name">{d.name}</span>
+                          <span className="ba-legend-count">{d.value}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

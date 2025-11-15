@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { User } from "../interfaces/user";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import "../css/graficos.css";
+import "../css/graficos_1.css";
 
 interface BotonAnalisisRegistrosProps {
   usuarios: User[];
