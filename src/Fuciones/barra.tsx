@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import image from "../Fuciones/imag/esme.png";
 import { useNavigate } from "react-router-dom";
 
@@ -12,23 +12,12 @@ const Barra: React.FC = () => {
     setIsOpen(!isOpen);
   };
 
-  // 🔹 Memorizar handleLogout para evitar advertencia
+  // 🔹 Mantiene logout manual únicamente
   const handleLogout = useCallback(() => {
     localStorage.clear();
     console.clear();
     navigate("/");
   }, [navigate]);
-
-  // 🔹 Cerrar sesión automáticamente cada 2 horas
-  useEffect(() => {
-    const dosHoras = 2 * 60 * 60 * 1000; // 2 horas en ms
-
-    const timeoutId = setTimeout(() => {
-      handleLogout();
-    }, dosHoras);
-
-    return () => clearTimeout(timeoutId); // limpiar si se desmonta
-  }, [handleLogout]);
 
   return (
     <nav
@@ -128,9 +117,10 @@ const Barra: React.FC = () => {
                   onClick={handleLogout}
                   style={{
                     border: "none",
-                    background: "none",
-                    padding: "12.8px 40px",
+                    background: "#005f80",
+                    padding: "10px 40px",
                     width: "100%",
+                    borderRadius: "20px",
                   }}
                 >
                   Cerrar sesión

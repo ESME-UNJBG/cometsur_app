@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import "../css/Ventana.css";
-
+import { API_URL } from "../config";
 interface ComputadoraModalProps {
   onClose: () => void;
 }
@@ -232,17 +232,14 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
       setSending(true);
       setErrorMsg(null);
 
-      const res = await fetch(
-        `https://cometsur-api.onrender.com/users/${usuarioEncontrado.id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body),
-        }
-      );
+      const res = await fetch(`${API_URL}/users/${usuarioEncontrado.id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => null);

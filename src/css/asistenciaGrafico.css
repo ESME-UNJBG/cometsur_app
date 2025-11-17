@@ -1,0 +1,20 @@
+.contenedor-botones-analisis {
+  border: 2px solid none; /* 👈 color del borde */
+  border-radius: 30px; /* 👈 radio del borde */
+  padding: 20px; /* espacio interno */
+  padding-top: 0px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  background-color: #fff;
+  /* sombra opcional */
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+
+  /* transición si quieres animación */
+  transition: all 0.3s ease-in-out;
+}
+
+/* Cambiar color cuando el usuario pasa el mouse */
+.contenedor-botones-analisis:hover {
+  border-color: none;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}

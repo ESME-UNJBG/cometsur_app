@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef, ChangeEvent } from "react";
 import "../css/Ventana.css";
-
+import { API_URL } from "../config";
 interface ComputadoraModalProps {
   onClose: () => void;
 }
@@ -95,19 +95,16 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     try {
       console.log("📤 Enviando actualización...", body);
 
-      const res = await fetch(
-        `https://cometsur-api.onrender.com/users/${selectedUser.id}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          mode: "cors",
-          body: JSON.stringify(body),
-        }
-      );
+      const res = await fetch(`${API_URL}/users/${selectedUser.id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        mode: "cors",
+        body: JSON.stringify(body),
+      });
 
       console.log("📥 Respuesta recibida:", res.status, res.statusText);
 

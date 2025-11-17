@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from "axios";
 import { FormData } from "../interfaces/register";
 import "../css/Ventana.css";
 import { Eye, EyeOff } from "lucide-react";
-
+import { API_URL } from "../config";
 interface RegisterFormProps {
   onClose: () => void;
   onUsuarioRegistrado?: (usuarioId: string) => void;
@@ -246,7 +246,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     }
 
     try {
-      const response = await fetch(`https://cometsur-api.onrender.com/users/`, {
+      const response = await fetch(`${API_URL}/users/`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -308,7 +308,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
     try {
       const response: AxiosResponse<RegisterResponse> = await axios.post(
-        "https://cometsur-api.onrender.com/auth/register",
+        `${API_URL}/auth/register`,
         formData,
         { headers: { "Content-Type": "application/json" } }
       );

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-
+import { API_URL } from "../config";
 export interface UserData {
   _id: string;
   name: string;
@@ -30,8 +30,6 @@ export const useUserSessionFull = (
 
   const previousUserData = useRef<UserData | null>(null);
   const isFetching = useRef<boolean>(false);
-
-  const API_URL = "https://cometsur-api.onrender.com";
 
   const updateLocalStorage = useCallback((data: UserData) => {
     try {

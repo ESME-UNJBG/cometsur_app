@@ -1,39 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { User } from "../interfaces/user";
+import { useUsuarios } from "../hook/useUsuarios";
 import BotonAnalisis from "./botonAnalisis";
 import BotonAnalisisRegistros from "./botonAnalisis 1";
 import BotonAnalisisAsistencia from "./botonAnalisis 2";
-
+import "../css/asistenciaGrafico.css";
 const AnalisisGrafico: React.FC = () => {
-  const [usuarios, setUsuarios] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { usuarios, cargando, error } = useUsuarios();
 
-  // Cargar usuarios desde localStorage
-  useEffect(() => {
-    const cargarUsuarios = () => {
-      try {
-        const stored = localStorage.getItem("usuarios");
-        if (stored) {
-          const usuariosData: User[] = JSON.parse(stored);
-          setUsuarios(usuariosData);
-        } else {
-          setUsuarios([]);
-        }
-      } catch (err) {
-        console.error("Error cargando usuarios:", err);
-        setError("Error al cargar los datos de usuarios");
-        setUsuarios([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    cargarUsuarios();
-  }, []);
-
-  // Si está cargando
-  if (loading) {
+  if (cargando) {
     return (
       <div className="card mb-4">
         <div className="card-body text-center p-4">
@@ -46,7 +19,6 @@ const AnalisisGrafico: React.FC = () => {
     );
   }
 
-  // Si hay error
   if (error) {
     return (
       <div className="card mb-4">
@@ -61,7 +33,6 @@ const AnalisisGrafico: React.FC = () => {
     );
   }
 
-  // Si no hay usuarios
   if (usuarios.length === 0) {
     return (
       <div className="card mb-4">
@@ -80,52 +51,23 @@ const AnalisisGrafico: React.FC = () => {
   }
 
   return (
-    <div className="card mb-4">
-      <div className="card-body">
-        {/* ENCABEZADO */}
-
-        {/* CONTENEDOR DE BOTONES */}
-        <div className="row g-3 justify-content-center">
-          {/* BOTÓN 1 - Análisis de Ingresos */}
-          <div className="col-sm-6 col-lg-4">
-            <div className="d-grid">
-              <BotonAnalisis usuarios={usuarios} />
-            </div>
-          </div>
-
-          {/* BOTÓN 2 - Análisis de Registros */}
-          <div className="col-sm-6 col-lg-4">
-            <div className="d-grid">
-              <BotonAnalisisRegistros usuarios={usuarios} />
-            </div>
-          </div>
-
-          {/* BOTÓN 3 - Análisis de Asistencia */}
-          <div className="col-sm-6 col-lg-4">
-            <div className="d-grid">
-              <BotonAnalisisAsistencia usuarios={usuarios} />
-            </div>
-          </div>
+    <div className="row g-3 justify-content-center contenedor-botones-analisis">
+      <div className="col-sm-6 col-lg-4">
+        <div className="d-grid">
+          <BotonAnalisis usuarios={usuarios} />
         </div>
+      </div>
 
-        {/* DESCRIPCIONES DE LOS BOTONES (opcional) */}
-        {/*<div className="row g-3 mt-2">
-          <div className="col-sm-6 col-lg-4">
-            <small className="text-muted d-block text-center">
-              Análisis de ingresos y métodos de pago
-            </small>
-          </div>
-          <div className="col-sm-6 col-lg-4">
-            <small className="text-muted d-block text-center">
-              Estadísticas de registros por fecha
-            </small>
-          </div>
-          <div className="col-sm-6 col-lg-4">
-            <small className="text-muted d-block text-center">
-              Control de asistencia y estados
-            </small>
-          </div>
-        </div>*/}
+      <div className="col-sm-6 col-lg-4">
+        <div className="d-grid">
+          <BotonAnalisisRegistros usuarios={usuarios} />
+        </div>
+      </div>
+
+      <div className="col-sm-6 col-lg-4">
+        <div className="d-grid">
+          <BotonAnalisisAsistencia usuarios={usuarios} />
+        </div>
       </div>
     </div>
   );

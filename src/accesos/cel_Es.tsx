@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import "../css/Ventana.css";
 import "../css/bt_esca.css";
+import { API_URL } from "../config";
 interface ComputadoraModalProps {
   onClose: () => void;
 }
@@ -150,7 +151,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
     }
 
     const index = dayMapping[selectedDay][turno];
-    const url = `https://cometsur-api.onrender.com/users/${usuarioEncontrado.id}`;
+    const url = `${API_URL}/users/${usuarioEncontrado.id}`;
 
     try {
       setSending(true);

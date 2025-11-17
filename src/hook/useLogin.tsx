@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-
+import { API_URL } from "../config";
 export interface LoginData {
   email: string;
   password: string;
@@ -44,8 +44,6 @@ const LOCAL_STORAGE_KEYS = {
   USER_CATEGORY: "userCategory",
 } as const;
 
-const API_URL = "https://cometsur-api.onrender.com";
-
 const useLogin = (): UseLoginReturn => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,8 +53,6 @@ const useLogin = (): UseLoginReturn => {
   const saveUserData = useCallback((data: LoginResponse) => {
     try {
       const { token, user } = data;
-
-      console.log("🔐 Guardando datos en localStorage:", user);
 
       localStorage.setItem(LOCAL_STORAGE_KEYS.TOKEN, token);
       localStorage.setItem(LOCAL_STORAGE_KEYS.USER_ID, user._id);
@@ -71,13 +67,13 @@ const useLogin = (): UseLoginReturn => {
       localStorage.setItem(LOCAL_STORAGE_KEYS.USER_IMPORTE, user.importe);
       localStorage.setItem(LOCAL_STORAGE_KEYS.USER_CATEGORY, user.category);
 
-      console.log("✅ Datos guardados en localStorage correctamente");
+      // 👉 REGISTRAR LA HORA DE LOGIN
+      localStorage.setItem("loginTime", Date.now().toString());
 
-      // Disparar evento personalizado para notificar a toda la app
       window.dispatchEvent(new Event("localStorageUpdated"));
       window.dispatchEvent(new Event("storage"));
     } catch (storageError) {
-      console.error("❌ Error al guardar en localStorage:", storageError);
+      console.error("Error al guardar en localStorage:", storageError);
       throw new Error("Error al guardar la sesión");
     }
   }, []);

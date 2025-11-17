@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { FormData } from "../interfaces/register";
-
+import { API_URL } from "../config";
 interface DuplicateCheck {
   emailDuplicado: boolean;
   baucherDuplicado: boolean;
@@ -43,16 +43,13 @@ const useCheckDuplicate = (
         error: null,
       });
       try {
-        const response = await fetch(
-          "https://cometsur-api.onrender.com/users/",
-          {
-            method: "GET",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await fetch(`${API_URL}/users/`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
 
         if (!response.ok) throw new Error("Error al obtener usuarios");
         const data: FormData[] = await response.json();

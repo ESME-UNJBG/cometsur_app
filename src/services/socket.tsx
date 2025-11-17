@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-
+import { API_URL } from "../config";
 let socket: Socket | null = null;
 
 export const initSocket = (opts?: { token?: string }): Socket | null => {
@@ -18,7 +18,7 @@ export const initSocket = (opts?: { token?: string }): Socket | null => {
 
   console.log("🔌 [SOCKET] Creando NUEVA conexión...");
 
-  socket = io("https://cometsur-api.onrender.com", {
+  socket = io(`${API_URL}`, {
     transports: ["websocket", "polling"],
     withCredentials: true,
     reconnectionAttempts: 5,

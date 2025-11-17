@@ -40,8 +40,8 @@ const BotonAnalisisRegistros: React.FC<BotonAnalisisRegistrosProps> = ({
     transition: "all 0.3s ease",
     minWidth: "160px",
     background: isHovered
-      ? "linear-gradient(135deg, #004c66, #005f80)"
-      : "linear-gradient(135deg, #005f80, #004c66)",
+      ? "linear-gradient(135deg, #004c66, #0073a0)"
+      : "linear-gradient(135deg, #0073a0, #004c66)",
     boxShadow: isHovered
       ? "0 6px 15px rgba(0, 95, 128, 0.4)"
       : "0 4px 12px rgba(0, 0, 0, 0.2)",

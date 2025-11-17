@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Html5Qrcode } from "html5-qrcode";
 import "../css/Ventana.css";
-
+import { API_URL } from "../config";
 interface ComputadoraModalProps {
   onClose: () => void;
 }
@@ -188,7 +188,7 @@ const ComputadoraModal: React.FC<ComputadoraModalProps> = ({ onClose }) => {
       return;
     }
 
-    const url = `https://cometsur-api.onrender.com/users/${selectedId}`;
+    const url = `${API_URL}/users/${selectedId}`;
 
     try {
       setDeleting(true);

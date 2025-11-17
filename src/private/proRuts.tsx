@@ -6,6 +6,8 @@ interface ProtectedRouteProps {
   children: JSX.Element;
 }
 
+const SESSION_DURATION = 2 * 60 * 60 * 1000; // ⏱️ 5 minutos (para pruebas)
+
 const ProtectedRoute = ({ allowedRoles, children }: ProtectedRouteProps) => {
   const [authState, setAuthState] = useState<{
     token: string | null;
@@ -15,47 +17,52 @@ const ProtectedRoute = ({ allowedRoles, children }: ProtectedRouteProps) => {
     role: localStorage.getItem("userRole"),
   });
 
-  // Función estable con useCallback para evitar recreaciones
   const checkAuth = useCallback(() => {
-    const currentToken = localStorage.getItem("Token");
-    const currentRole = localStorage.getItem("userRole");
+    const token = localStorage.getItem("Token");
+    const role = localStorage.getItem("userRole");
+    const loginTime = localStorage.getItem("loginTime");
 
-    return { token: currentToken, role: currentRole };
+    // ⏱️ Validación de expiración
+    if (token && loginTime) {
+      const now = Date.now();
+      const elapsed = now - Number(loginTime);
+
+      if (elapsed >= SESSION_DURATION) {
+        // ❌ Sesión expirada → borrar todo
+        localStorage.removeItem("Token");
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("loginTime");
+        window.dispatchEvent(new Event("storage"));
+
+        return { token: null, role: null };
+      }
+    }
+
+    return { token, role };
   }, []);
 
-  // Efecto para sincronizar estado - CORREGIDO
   useEffect(() => {
     const { token, role } = checkAuth();
 
-    // Solo actualizar estado si hay cambios reales
     if (token !== authState.token || role !== authState.role) {
       setAuthState({ token, role });
     }
-  }, [authState.token, authState.role, checkAuth]); // Dependencias estables
+  }, [authState.token, authState.role, checkAuth]);
 
-  // Efecto SEPARADO para eventos - CORREGIDO
+  // 🔁 Revisión frecuente (cada 10s)
   useEffect(() => {
-    const handleStorage = (e: StorageEvent) => {
-      if (e.key === "Token" || e.key === "userRole") {
-        const { token, role } = checkAuth();
+    const interval = setInterval(() => {
+      const { token, role } = checkAuth();
 
-        if (!token || !role) {
-          window.location.href = "/";
-          return;
-        }
-
-        // Solo recargar si el rol cambió
-        if (role !== authState.role) {
-          window.location.reload();
-        }
+      if (!token || !role) {
+        window.location.href = "/";
       }
-    };
+    }, 10000);
 
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
-  }, [authState.role, checkAuth]); // Dependencias estables
+    return () => clearInterval(interval);
+  }, [checkAuth]);
 
-  // Redirecciones - SIN EFECTO
   if (!authState.token || !authState.role) {
     return <Navigate to="/" replace />;
   }
