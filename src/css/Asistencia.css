@@ -29,21 +29,29 @@
   align-items: center;
   z-index: 9999;
   animation: fadeInOverlay 0.3s ease forwards;
+  /* 🔥 NUEVO: Padding y altura controlada */
+  padding: 20px;
 }
 
 .modal-content {
   background-color: #ffffff !important;
   opacity: 1 !important;
-  border-radius: 32px !important;
+  border-radius: 40px !important;
   padding: 2rem 1.5rem 1.5rem 1.5rem !important;
   width: 90%;
   max-width: 420px;
+  /* 🔥 NUEVO: Altura máxima y centrado mejorado */
+  max-height: 85vh;
+  margin: auto;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.28);
   position: relative;
   z-index: 10000;
   border: 0.5px solid rgba(0, 0, 0, 0.06);
   text-align: center;
   animation: fadeIn 0.3s ease;
+  /* 🔥 NUEVO: Flexbox para control de altura */
+  display: flex;
+  flex-direction: column;
 }
 
 /* Botón X (ambos modales) */
@@ -55,7 +63,7 @@
   background: none;
   border: none;
   color: #666;
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: bold;
   cursor: pointer;
   line-height: 1;
@@ -124,6 +132,8 @@
   width: 100%;
   height: 220px;
   margin-bottom: 1rem;
+  /* 🔥 NUEVO: Altura fija para consistencia */
+  flex-shrink: 0;
 }
 
 .grafico-porcentaje {
@@ -141,43 +151,19 @@
   color: #2e7d32;
   margin-top: 1rem;
   font-size: 0.95rem;
+  /* 🔥 NUEVO: Empujar hacia abajo */
+  margin-top: auto;
+  padding-top: 1rem;
 }
 
-/* ======================================== */
-/* 📱 RESPONSIVE */
-/* ======================================== */
-
-@media (max-width: 480px) {
-  .modal-content {
-    width: 95%;
-    padding: 1.5rem 1rem;
-  }
-
-  .close-modal-btn,
-  .close-modal-x {
-    font-size: 1.5rem;
-    top: 8px;
-    right: 10px;
-  }
-
-  .asistencia-btn,
-  .progreso-btn {
-    min-width: 130px;
-    font-size: 0.9rem;
-  }
-
-  .asistencia-btn-group {
-    flex-direction: column;
-    align-items: center;
-    gap: 0.8rem;
-  }
-}
 /* ======================================== */
 /* 📈 BARRAS DE PROGRESO DE ASISTENCIA */
 /* ======================================== */
 
 .modal-dia {
   margin-bottom: 1rem;
+  /* 🔥 NUEVO: Evitar crecimiento excesivo */
+  flex-shrink: 0;
 }
 
 .modal-dia-info {
@@ -217,6 +203,75 @@
 .progress-bar-green {
   background-color: #4caf50;
 }
+
+/* ======================================== */
+/* 📱 RESPONSIVE - COMPORTAMIENTO MOBILE ORIGINAL */
+/* ======================================== */
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 10px; /* Menos padding en móviles */
+    align-items: center; /* Centrado completo en móviles */
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 1.5rem 1.5rem;
+    max-height: 90vh; /* Un poco más de altura en móviles */
+  }
+
+  .close-modal-btn,
+  .close-modal-x {
+    font-size: 1.5rem;
+    top: 8px;
+    right: 10px;
+  }
+
+  .asistencia-btn,
+  .progreso-btn {
+    min-width: 130px;
+    font-size: 0.9rem;
+  }
+
+  .asistencia-btn-group {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+  }
+}
+
+/* ======================================== */
+/* 🖥️ CORRECCIÓN ESPECÍFICA PANTALLAS GRANDES */
+/* ======================================== */
+
+@media (min-width: 768px) {
+  .modal-overlay {
+    align-items: flex-start; /* 🔥 Alineación arriba en pantallas grandes */
+    padding-top: 10vh; /* 🔥 Espacio desde arriba */
+  }
+
+  .modal-content {
+    max-height: 70vh; /* 🔥 Más compacto en desktop */
+    margin-top: 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .modal-overlay {
+    padding-top: 15vh; /* 🔥 Un poco más abajo en pantallas muy grandes */
+  }
+
+  .modal-content {
+    max-height: 65vh; /* 🔥 Aún más compacto */
+  }
+}
+
+/* 🔥 NUEVO: Asegurar que el título no crezca */
+.modal-title {
+  flex-shrink: 0;
+  margin-bottom: 1.5rem;
+}
+
 /* ======================================== */
 /* 🏗️ ESTILOS PARA ANÁLISIS GENERAL (EXTENDIENDO ASISTENCIA) */
 /* ======================================== */

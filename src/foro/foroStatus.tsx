@@ -1,3 +1,4 @@
+// src/foro/foroStatus.tsx
 import React from "react";
 
 interface ChatStatusProps {
@@ -13,7 +14,10 @@ export const ChatStatus: React.FC<ChatStatusProps> = ({
 }) => {
   const getStatusInfo = () => {
     if (conectando) {
-      return { text: "🔄 Conectando...", variant: "warning" };
+      return {
+        text: "🔄 Conectando...",
+        variant: "warning",
+      };
     }
 
     if (estaConectado && currentUser) {
@@ -23,14 +27,19 @@ export const ChatStatus: React.FC<ChatStatusProps> = ({
       };
     }
 
-    return { text: "❌ Desconectado", variant: "danger" };
+    return {
+      text: "❌ Desconectado del servidor",
+      variant: "danger",
+    };
   };
 
   const status = getStatusInfo();
 
   return (
-    <div className={`alert alert-${status.variant} mb-3 py-2`}>
+    <div className={`alert alert-${status.variant} py-2 px-3 mb-2`}>
       <small>{status.text}</small>
     </div>
   );
 };
+
+export default ChatStatus;

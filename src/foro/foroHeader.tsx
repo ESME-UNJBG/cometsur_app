@@ -1,3 +1,4 @@
+// src/foro/ForoHeader.tsx
 import React from "react";
 
 interface ForoHeaderProps {
@@ -6,9 +7,18 @@ interface ForoHeaderProps {
 
 const ForoHeader: React.FC<ForoHeaderProps> = ({ onClose }) => {
   return (
-    <div className="modal-header">
-      <h5 className="modal-title">💬 Foro en Tiempo Real</h5>
-      <button type="button" className="btn-close" onClick={onClose}></button>
+    <div className="foro-header">
+      <h5 className="foro-title">💬 Foro en Tiempo Real</h5>
+
+      {/* botón simple con X visible y accesible */}
+      <button
+        className="foro-close-btn"
+        onClick={onClose}
+        aria-label="Cerrar foro"
+        type="button"
+      >
+        ✕
+      </button>
     </div>
   );
 };

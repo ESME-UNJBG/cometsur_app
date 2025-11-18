@@ -1,0 +1,431 @@
+/* src/foro/ChatModal.css */
+
+/* === VARIABLES CSS - PALETA ARMÓNICA CON TU APP === */
+:root {
+  /* Colores principales - Basados en tu imagen */
+  --foro-primary: #5e0829; /* Rojo vino oscuro */
+  --foro-primary-dark: #4a0620; /* Versión más oscura */
+  --foro-primary-light: #7a0a34; /* Versión más clara */
+  --foro-secondary: #1e7e34; /* Verde éxito */
+  --foro-accent: #3b82f6; /* Azul para detalles */
+
+  /* Colores neutros - Manteniendo contraste */
+  --foro-bg: #ffffff;
+  --foro-surface: #f8f9fa; /* Fondo ligeramente gris */
+  --foro-border: #dee2e6; /* Bordes suaves */
+  --foro-text: #212529; /* Texto principal */
+  --foro-text-light: #6c757d; /* Texto secundario */
+
+  /* Estados */
+  --foro-success: #198754; /* Verde más armónico */
+  --foro-warning: #ffc107; /* Amarillo */
+  --foro-error: #dc3545; /* Rojo */
+
+  /* Mensajes */
+  --foro-own-message-bg: #e8f5e8; /* Verde muy claro para mensajes propios */
+  --foro-other-message-bg: #f8f9fa; /* Gris claro para otros */
+  --foro-own-message-text: #155724; /* Texto verde oscuro */
+  --foro-other-message-text: #212529; /* Texto normal */
+
+  /* Efectos */
+  --foro-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --foro-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+/* === CORRECCIÓN DE CENTRADO - SIN DESPLAZAMIENTO === */
+.modal.fade.show.d-block.chat-modal-override {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 40px 20px;
+  z-index: 1050;
+  margin: 0 !important;
+  overflow: hidden; /* Previene el desplazamiento */
+}
+
+/* Fuerza el centrado perfecto */
+.foro-modal-dialog {
+  width: auto;
+  margin: auto !important; /* Centrado forzado */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-height: 90vh;
+  transform: none !important; /* Anula transform de Bootstrap que causa desplazamiento */
+}
+
+/* Asegurar que el contenido ocupe el ancho completo */
+.foro-modal-content {
+  width: 100%;
+  max-width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* === ANCHO MEJORADO PARA PANTALLAS GRANDES === */
+
+/* Pantallas pequeñas (default) */
+.foro-modal-dialog.modal-lg {
+  max-width: 95%;
+  width: 95%;
+}
+
+/* Tablets y pantallas medianas */
+@media (min-width: 768px) {
+  .foro-modal-dialog.modal-lg {
+    max-width: 85%;
+    width: 85%;
+  }
+
+  .modal.fade.show.d-block.chat-modal-override {
+    padding: 50px 30px;
+  }
+}
+
+/* Pantallas grandes */
+@media (min-width: 992px) {
+  .foro-modal-dialog.modal-lg {
+    max-width: 75%;
+    width: 75%;
+  }
+}
+
+/* Pantallas extra grandes - 60% como solicitaste */
+@media (min-width: 1200px) {
+  .foro-modal-dialog.modal-lg {
+    max-width: 60%;
+    width: 60%;
+  }
+
+  .modal.fade.show.d-block.chat-modal-override {
+    padding: 60px 40px;
+  }
+
+  /* Corrección específica para centrado en pantallas grandes */
+  .modal.fade.show.d-block.chat-modal-override {
+    align-items: flex-start; /* Cambiado a flex-start para evitar desplazamiento */
+    padding-top: 80px; /* Compensa el cambio */
+  }
+}
+
+/* Pantallas MUY grandes */
+@media (min-width: 1400px) {
+  .foro-modal-dialog.modal-lg {
+    max-width: 60%;
+    width: 60%;
+  }
+
+  .modal.fade.show.d-block.chat-modal-override {
+    padding: 100px 50px;
+  }
+}
+
+/* ALTERNATIVA: Posicionamiento absoluto para la X */
+.foro-header {
+  background: linear-gradient(
+    135deg,
+    var(--foro-primary) 0%,
+    var(--foro-primary-dark) 100%
+  );
+  border-bottom: none;
+  padding: 1.25rem 1.5rem;
+  position: relative;
+}
+
+.foro-title {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.foro-close-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.125rem;
+  transition: all 0.2s ease;
+  opacity: 0.8;
+  position: absolute;
+  right: 1.5rem; /* Mismo padding que el header */
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.foro-close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  opacity: 1;
+  transform: translateY(-50%) scale(1.05);
+}
+
+/* === CONTENEDOR DE MENSAJES - SCROLL SEGURO === */
+.chat-messages-container {
+  height: 400px;
+  overflow-y: auto;
+  padding: 1.25rem;
+  background: var(--foro-surface);
+  position: relative;
+  flex: 1;
+}
+
+/* Scrollbar personalizado con tus colores */
+.chat-messages-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-messages-container::-webkit-scrollbar-track {
+  background: var(--foro-surface);
+  border-radius: 4px;
+}
+
+.chat-messages-container::-webkit-scrollbar-thumb {
+  background: var(--foro-primary);
+  border-radius: 4px;
+}
+
+.chat-messages-container::-webkit-scrollbar-thumb:hover {
+  background: var(--foro-primary-dark);
+}
+
+/* === BOTÓN DE NUEVOS MENSAJES - CON TUS COLORES === */
+.foro-new-messages-btn {
+  background: var(--foro-primary) !important;
+  border: none !important;
+  border-radius: 24px !important;
+  padding: 12px 18px !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  transition: all 0.2s ease !important;
+  box-shadow: var(--foro-shadow) !important;
+  color: white !important;
+  min-width: auto !important;
+}
+
+.foro-new-messages-btn:hover {
+  background: var(--foro-primary-dark) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 15px -3px rgba(94, 8, 41, 0.4) !important;
+}
+
+.foro-new-messages-badge {
+  background: white !important;
+  color: var(--foro-primary) !important;
+  border-radius: 50% !important;
+  min-width: 24px !important;
+  height: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  border: 1px solid var(--foro-border) !important;
+}
+
+/* Posicionamiento del botón de nuevos mensajes */
+.foro-new-messages-indicator {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1051;
+}
+
+/* === ESTADOS DE CONEXIÓN - CON TUS COLORES === */
+.foro-status-connected {
+  color: var(--foro-success);
+  font-weight: 500;
+}
+
+.foro-status-connecting {
+  color: var(--foro-warning);
+  font-weight: 500;
+}
+
+.foro-status-disconnected {
+  color: var(--foro-error);
+  font-weight: 500;
+}
+
+/* === ÁREA DE INPUT - MEJORADA === */
+.foro-input-container {
+  background: var(--foro-bg);
+  border-top: 1px solid var(--foro-border);
+  padding: 1.5rem 1.75rem;
+}
+
+/* === ESTILOS PARA MENSAJES INDIVIDUALES === */
+.foro-message-own {
+  background-color: var(--foro-own-message-bg);
+  border-left: 4px solid var(--foro-success);
+  color: var(--foro-own-message-text);
+}
+
+.foro-message-other {
+  background-color: var(--foro-other-message-bg);
+  border-left: 4px solid var(--foro-primary);
+  color: var(--foro-other-message-text);
+}
+
+/* === ESTILOS RESPONSIVE - SEGUROS === */
+@media (max-width: 768px) {
+  .chat-messages-container {
+    height: 350px;
+    padding: 1rem;
+  }
+
+  .foro-header {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .foro-input-container {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .foro-new-messages-indicator {
+    bottom: 15px;
+    right: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal.fade.show.d-block.chat-modal-override {
+    padding: 20px 15px;
+  }
+
+  .foro-modal-dialog.modal-lg {
+    max-width: 98%;
+    width: 98%;
+  }
+
+  .chat-messages-container {
+    height: 300px;
+    padding: 0.875rem;
+  }
+
+  .foro-header {
+    padding: 1rem 1.25rem;
+  }
+
+  .foro-input-container {
+    padding: 1rem 1.25rem;
+  }
+
+  .foro-new-messages-btn {
+    padding: 10px 14px !important;
+  }
+}
+
+/* === ANIMACIONES SUAVES === */
+.foro-modal-content {
+  animation: foroSlideIn 0.3s ease-out;
+}
+
+@keyframes foroSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.chat-message-item {
+  animation: messageSlideIn 0.2s ease-out;
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* === CLASES UTILITARIAS - NO CONFLICTIVAS === */
+.foro-text-ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.foro-divider {
+  height: 1px;
+  background: var(--foro-border);
+  margin: 1rem 0;
+}
+
+.foro-typing-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--foro-text-light);
+  font-style: italic;
+  padding: 0.5rem 0;
+}
+
+/* === ESTADOS DE FOCO MEJORADOS === */
+.foro-input:focus {
+  border-color: var(--foro-primary) !important;
+  box-shadow: 0 0 0 2px rgba(94, 8, 41, 0.1) !important;
+}
+
+.foro-btn-primary {
+  background: var(--foro-primary) !important;
+  border-color: var(--foro-primary) !important;
+}
+
+.foro-btn-primary:hover {
+  background: var(--foro-primary-dark) !important;
+  border-color: var(--foro-primary-dark) !important;
+}
+
+/* === MEJORAS DE DISEÑO ADICIONALES === */
+.modal-body.p-0 {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.position-relative {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* === CORRECCIÓN ESPECÍFICA PARA EL DESPLAZAMIENTO === */
+/* Fuerza el centrado vertical sin desplazamiento */
+.modal-dialog-centered {
+  min-height: auto !important;
+  transform: translateY(0) !important;
+}
+
+/* Previene el scroll del body cuando el modal está abierto */
+body.modal-open {
+  overflow: hidden;
+  padding-right: 0 !important;
+}

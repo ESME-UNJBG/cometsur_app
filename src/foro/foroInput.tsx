@@ -1,8 +1,9 @@
+// src/foro/foroInput.tsx
 import React from "react";
 
 interface ChatInputProps {
   mensaje: string;
-  setMensaje: (mensaje: string) => void;
+  setMensaje: (v: string) => void;
   enviarMensaje: () => void;
   estaConectado: boolean;
   conectando: boolean;
@@ -15,14 +16,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   estaConectado,
   conectando,
 }) => {
-  const handleKeyPress = (e: React.KeyboardEvent): void => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      enviarMensaje();
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent): void => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     enviarMensaje();
   };
@@ -34,26 +28,28 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           type="text"
           className="form-control"
           placeholder={
-            conectando
+            !estaConectado
               ? "Conectando..."
-              : estaConectado
-              ? "Escribe tu mensaje..."
-              : "Desconectado"
+              : conectando
+              ? "Conectando al chat…"
+              : "Escribe un mensaje..."
           }
           value={mensaje}
           onChange={(e) => setMensaje(e.target.value)}
-          onKeyPress={handleKeyPress}
           disabled={!estaConectado || conectando}
         />
 
         <button
           type="submit"
           className="btn btn-primary"
-          disabled={!estaConectado || conectando || !mensaje.trim()}
+          disabled={!mensaje.trim() || !estaConectado || conectando}
+          title="Enviar mensaje"
         >
-          {conectando ? "⌛" : "📤"}
+          ➤
         </button>
       </div>
     </form>
   );
 };
+
+export default ChatInput;

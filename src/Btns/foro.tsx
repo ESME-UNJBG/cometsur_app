@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { ChatModal } from "../foro/ForoModal";
-
+import "../css/chatModal.css";
 export const ChatButton: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <>
       <button
-        className="btn btn-primary btn-lg d-flex align-items-center gap-2 shadow"
+        className="btn --foro-primary-light btn-lg d-flex align-items-center gap-2 shadow"
         onClick={() => setIsModalOpen(true)}
       >
         <span>💬</span>

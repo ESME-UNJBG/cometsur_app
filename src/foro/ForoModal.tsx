@@ -3,7 +3,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { useChat } from "../foro/useForo";
 import { ChatMessages } from "../foro/foroMessages";
 import { ChatInput } from "../foro/foroInput";
-import { ChatStatus } from "../foro/foroStatus";
+//import { ChatStatus } from "../foro/foroStatus";
+import "../css/chatModal.css";
 
 interface ChatModalProps {
   isOpen: boolean;
@@ -21,111 +22,105 @@ export const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose }) => {
     enviarMensaje,
   } = useChat();
 
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
-  const scrollContainerRef = useRef<HTMLElement | null>(null);
-
-  const [isUserNearBottom, setIsUserNearBottom] = useState<boolean>(true);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [newMessagesCount, setNewMessagesCount] = useState<number>(0);
-  const prevMessagesCountRef = useRef<number>(mensajes.length);
+  const [isAutoScrollEnabled, setIsAutoScrollEnabled] = useState<boolean>(true);
 
-  const detectScrollContainer = () => {
-    const wrapper = wrapperRef.current;
-    if (!wrapper) return null;
-    const inner = wrapper.querySelector<HTMLElement>(".chat-messages");
-    if (inner) return inner;
-    return wrapper;
-  };
-
-  const handleScroll = () => {
-    const c = scrollContainerRef.current;
-    if (!c) return;
-    const scrollTop = c.scrollTop;
-    const scrollHeight = c.scrollHeight;
-    const clientHeight = (c as HTMLElement).clientHeight;
-    const distance = scrollHeight - scrollTop - clientHeight;
-    const near = distance < 120;
-    setIsUserNearBottom(near);
-    if (near) setNewMessagesCount(0);
-  };
-
+  // 🔥 NUEVO: CORRECCIÓN DE DESPLAZAMIENTO AL ABRIR MODAL
   useEffect(() => {
-    const container = detectScrollContainer();
-    scrollContainerRef.current = container;
-    if (container) {
-      container.addEventListener("scroll", handleScroll, { passive: true });
-      handleScroll();
-    }
-    return () => {
-      if (scrollContainerRef.current) {
-        scrollContainerRef.current.removeEventListener("scroll", handleScroll);
+    if (!isOpen) return;
+
+    // Pequeño delay para asegurar que el DOM esté renderizado
+    const timer = setTimeout(() => {
+      // Forzar el centrado del modal y prevenir desplazamiento
+      const modalElement = document.querySelector(
+        ".modal.fade.show.d-block.chat-modal-override"
+      );
+      if (modalElement) {
+        // Scroll al inicio del viewport para evitar desplazamiento hacia arriba
+        window.scrollTo({
+          top: 0,
+          behavior: "auto",
+        });
+
+        // Asegurar que el body no tenga scroll
+        document.body.classList.add("modal-open");
       }
-      scrollContainerRef.current = null;
+    }, 10);
+
+    return () => {
+      clearTimeout(timer);
+      document.body.classList.remove("modal-open");
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
-  const scrollToBottom = () => {
-    const c = scrollContainerRef.current;
-    if (!c) return;
-    c.scrollTop = c.scrollHeight;
-    setNewMessagesCount(0);
-    setIsUserNearBottom(true);
-  };
-
-  useEffect(() => {
-    const prev = prevMessagesCountRef.current;
-    const now = mensajes.length;
-    const added = now - prev;
-    prevMessagesCountRef.current = now;
-
-    if (added <= 0) {
-      return;
-    }
-
-    const lastMsg = mensajes[mensajes.length - 1];
-    const lastIsOwn =
-      lastMsg && currentUser && lastMsg.userId === currentUser.id;
-
-    if (lastIsOwn) {
-      scrollToBottom();
-      return;
-    }
-
-    if (isUserNearBottom) {
-      scrollToBottom();
-      return;
-    }
-
-    setNewMessagesCount((c) => c + added);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mensajes, currentUser]);
-
+  // 1. SCROLL AL ABRIR EL MODAL - Solo una vez al inicio
   useEffect(() => {
     if (isOpen) {
-      const t = setTimeout(() => {
-        const container = detectScrollContainer();
-        if (container) {
-          if (
-            scrollContainerRef.current &&
-            scrollContainerRef.current !== container
-          ) {
-            scrollContainerRef.current.removeEventListener(
-              "scroll",
-              handleScroll
-            );
-          }
-          scrollContainerRef.current = container;
-          scrollContainerRef.current.addEventListener("scroll", handleScroll, {
-            passive: true,
-          });
-          container.scrollTop = container.scrollHeight;
-        }
-      }, 60);
-      return () => clearTimeout(t);
+      // Pequeño delay para asegurar que el DOM está renderizado
+      setTimeout(() => {
+        scrollToBottom();
+        setIsAutoScrollEnabled(true);
+      }, 100);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
+  // 2. SCROLL AUTOMÁTICO SOLO PARA MENSAJES PROPIOS
+  useEffect(() => {
+    if (mensajes.length === 0) return;
+
+    const lastMessage = mensajes[mensajes.length - 1];
+    const isOwnMessage = currentUser && lastMessage.userId === currentUser.id;
+
+    if (isOwnMessage && isAutoScrollEnabled) {
+      // Scroll inmediato para mensajes propios
+      scrollToBottom();
+    } else if (!isOwnMessage && isAutoScrollEnabled) {
+      // Scroll para mensajes de otros solo si el auto-scroll está activado
+      scrollToBottom();
+    } else if (!isOwnMessage && !isAutoScrollEnabled) {
+      // Mostrar botón de nuevos mensajes si no está en auto-scroll
+      setNewMessagesCount((prev) => prev + 1);
+    }
+  }, [mensajes, currentUser, isAutoScrollEnabled]);
+
+  // 3. DETECTAR CUANDO EL USUARIO HACE SCROLL MANUAL
+  const handleScroll = () => {
+    if (!scrollContainerRef.current) return;
+
+    const { scrollTop, scrollHeight, clientHeight } =
+      scrollContainerRef.current;
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+
+    // Si el usuario scrollea hacia arriba (más de 100px desde el fondo), desactivar auto-scroll
+    if (distanceFromBottom > 100) {
+      setIsAutoScrollEnabled(false);
+    } else {
+      // Si está cerca del fondo, reactivar auto-scroll
+      setIsAutoScrollEnabled(true);
+      setNewMessagesCount(0);
+    }
+  };
+
+  // 4. FUNCIÓN SIMPLE DE SCROLL
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    } else if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop =
+        scrollContainerRef.current.scrollHeight;
+    }
+  };
+
+  // 5. MANEJO MANUAL DEL SCROLL
+  const handleManualScrollToBottom = () => {
+    scrollToBottom();
+    setIsAutoScrollEnabled(true);
+    setNewMessagesCount(0);
+  };
+
+  // 6. MANEJO DE TECLADO
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -138,95 +133,98 @@ export const ChatModal: React.FC<ChatModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div
-      className="modal fade show d-block"
-      style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-      tabIndex={-1}
-    >
-      <div className="modal-dialog modal-dialog-centered modal-lg">
-        <div className="modal-content">
-          <div className="modal-header bg-primary text-white">
-            <h5 className="modal-title">💬 Foro</h5>
-            <button
-              type="button"
-              className="btn-close btn-close-white"
-              onClick={onClose}
-            />
-          </div>
+    <>
+      {/* Backdrop para cerrar al hacer clic fuera */}
+      {isOpen && (
+        <div
+          className="modal-backdrop show"
+          style={{ zIndex: 1040 }}
+          onClick={onClose}
+        />
+      )}
 
-          <div className="modal-body p-0">
-            <div className="px-3 pt-3">
-              <ChatStatus
-                estaConectado={estaConectado}
-                conectando={conectando}
-                currentUser={currentUser}
-              />
+      {/* Modal principal - CORREGIDO EL CENTRADO */}
+      <div
+        className="modal fade show d-block chat-modal-override"
+        tabIndex={-1}
+        style={{
+          zIndex: 1050,
+          display: isOpen ? "flex" : "none",
+        }}
+      >
+        <div className="modal-dialog modal-dialog-centered modal-lg foro-modal-dialog">
+          <div className="modal-content foro-modal-content">
+            {/* Header */}
+            <div className="modal-header foro-header">
+              <h5 className="modal-title foro-title">💬 Foro</h5>
+              <button
+                type="button"
+                className="foro-close-btn"
+                onClick={onClose}
+                aria-label="Cerrar"
+              >
+                ✕
+              </button>
             </div>
 
-            <div className="position-relative">
-              <div
-                ref={wrapperRef}
-                style={{
-                  minHeight: 300,
-                  maxHeight: 400,
-                  overflowY: "auto",
-                }}
-              >
-                <ChatMessages
-                  mensajes={mensajes}
-                  currentUserId={currentUser?.id || null}
+            {/* Body */}
+            <div className="modal-body p-0">
+              {/*<div className="px-3 pt-3">
+                <ChatStatus
+                  estaConectado={estaConectado}
+                  conectando={conectando}
+                  currentUser={currentUser}
                 />
-                <div />
+              </div>*/}
+
+              {/* Área de mensajes con scroll */}
+              <div className="position-relative">
+                <div
+                  ref={scrollContainerRef}
+                  className="chat-messages-container"
+                  onScroll={handleScroll}
+                >
+                  <ChatMessages
+                    mensajes={mensajes}
+                    currentUserId={currentUser?.id || null}
+                  />
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Botón de nuevos mensajes */}
+                {newMessagesCount > 0 && (
+                  <div className="foro-new-messages-indicator">
+                    <button
+                      className="foro-new-messages-btn"
+                      onClick={handleManualScrollToBottom}
+                      title={`Ver ${newMessagesCount} mensaje${
+                        newMessagesCount > 1 ? "s" : ""
+                      } nuevo${newMessagesCount > 1 ? "s" : ""}`}
+                    >
+                      <span>↓</span>
+                      <span className="foro-new-messages-badge">
+                        {newMessagesCount}
+                      </span>
+                    </button>
+                  </div>
+                )}
               </div>
 
-              {/* BOTÓN MINIMALISTA - SIN NÚMERO */}
-              {newMessagesCount > 0 && (
-                <div
-                  className="position-absolute"
-                  style={{
-                    bottom: "15px",
-                    right: "15px",
-                    zIndex: 1000,
-                  }}
-                >
-                  <button
-                    className="btn btn-light btn-sm shadow-sm"
-                    onClick={scrollToBottom}
-                    style={{
-                      borderRadius: "50%",
-                      width: "40px",
-                      height: "40px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "1rem",
-                      border: "1px solid #dee2e6",
-                      backgroundColor: "white",
-                    }}
-                    title="Ver mensajes nuevos"
-                  >
-                    ↓
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* MÁS ESPACIO EN EL ÁREA DE ESCRITURA */}
-            <div className="border-top mx-3 py-3">
-              {" "}
-              {/* Aumentado a py-3 */}
-              <ChatInput
-                mensaje={mensaje}
-                setMensaje={setMensaje}
-                enviarMensaje={enviarMensaje}
-                estaConectado={estaConectado}
-                conectando={conectando}
-              />
+              {/* Área de input */}
+              <div className="foro-input-container">
+                <ChatInput
+                  mensaje={mensaje}
+                  setMensaje={setMensaje}
+                  enviarMensaje={enviarMensaje}
+                  estaConectado={estaConectado}
+                  conectando={conectando}
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
