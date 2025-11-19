@@ -429,3 +429,6 @@ body.modal-open {
   overflow: hidden;
   padding-right: 0 !important;
 }
+.custom-dark-gray {
+  background-color: #6c757d !important; /* Gris más oscuro */
+}
