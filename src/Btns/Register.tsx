@@ -77,6 +77,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     "live.com",
     "yahoo.com",
     "unjbg.edu.pe",
+    "unsaac.edu.pe",
+    "unitru.edu.pe",
   ];
 
   const UNIVERSITY_OPTIONS = [
@@ -87,6 +89,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     "UNMSM",
     "UNT",
     "UNDAC",
+    "UNAP",
     "Otra universidad",
   ];
 

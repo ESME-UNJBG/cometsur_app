@@ -49,7 +49,7 @@ export const useUsuarios = () => {
     fetchUsuarios();
 
     // Opcional: actualización automática
-    const interval = setInterval(() => fetchUsuarios(), 10000);
+    const interval = setInterval(() => fetchUsuarios(), 20000);
     return () => clearInterval(interval);
   }, [fetchUsuarios]);
 
