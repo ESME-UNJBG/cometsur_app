@@ -102,6 +102,33 @@ export const useUserSessionFull = (
         const errorMessage =
           err instanceof Error ? err.message : "Error desconocido";
 
+        // ✅ NUEVO CÓDIGO - Detectar usuario eliminado
+        if (
+          err instanceof Error &&
+          (err.message.includes("404") || err.message.includes("Not_Usuario"))
+        ) {
+          console.log("🔄 Usuario eliminado, limpiando sesión completa...");
+
+          // Limpieza COMPLETA
+          localStorage.removeItem("Token");
+          localStorage.removeItem("userId");
+          localStorage.removeItem("userRole");
+          localStorage.removeItem("userName");
+          localStorage.removeItem("userEmail");
+          localStorage.removeItem("userUniversity");
+          localStorage.removeItem("userImporte");
+          localStorage.removeItem("userCategory");
+          localStorage.removeItem("userAsistencia");
+          localStorage.removeItem("loginTime"); // ⬅️ CLAVE para ProtectedRoute
+
+          window.dispatchEvent(new Event("storage"));
+
+          // Resetear estados del hook
+          setUserData(null);
+          setError("Usuario no encontrado");
+          return; // Detener ejecución
+        }
+
         // Solo mostrar errores que no sean de fondo
         if (!isBackgroundUpdate) {
           console.error("❌ Error al actualizar sesión:", errorMessage);
