@@ -5,7 +5,9 @@ import Foor from "../Fuciones/footuser";
 //import Tarj from "../Fuciones/tarjeta";
 import Imagenes from "../Fuciones/imagenes";
 /* import Cont from "./Fuciones/Cont"; */
-import Imagen from "../Fuciones/separ";
+import Tit from "../Fuciones/separ";
+import TitD from "../Fuciones/separDia";
+import Crono from "../cronograma/crono";
 const Home: React.FC = () => {
   return (
     <>
@@ -22,8 +24,6 @@ const Home: React.FC = () => {
       </div>
       <div
         style={{
-          marginTop: "0.5px", // Altura de la barra superior
-          marginBottom: "0.5px", // Altura de la barra inferior
           display: "flex",
         }}
       >
@@ -31,9 +31,11 @@ const Home: React.FC = () => {
       </div>
       {/*<Imagen></Imagen>*/}
       <div>
-        <Imagen></Imagen>
+        <Tit></Tit>
       </div>
       <Carr></Carr>
+      <TitD></TitD>
+      <Crono></Crono>
       <div
         style={{
           marginTop: "", // Altura de la barra superior

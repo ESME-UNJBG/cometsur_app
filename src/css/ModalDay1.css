@@ -1,0 +1,230 @@
+/* ============================
+   OVERLAY
+============================ */
+.ba-day1-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+/* ============================
+   MODAL
+============================ */
+.ba-day1-modal {
+  background: #ffffff;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 1300px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================
+   HEADER FIJO
+============================ */
+.ba-day1-header {
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  z-index: 5;
+  border-bottom: 2px solid #e3e6ea;
+}
+
+.ba-day1-title {
+  grid-column: 2;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #7a0000;
+  text-align: center;
+}
+
+.ba-day1-close {
+  grid-column: 3;
+  justify-self: end;
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  color: #5e0829;
+  cursor: pointer;
+}
+
+.ba-day1-close:hover {
+  color: #8a0c3b;
+}
+
+/* ============================
+   CUERPO SCROLLEABLE
+============================ */
+.ba-day1-grid {
+  overflow-y: auto;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  max-height: calc(80vh - 80px);
+}
+
+/* ============================
+   CELDAS
+============================ */
+.ba-day1-cell {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 1rem;
+  border: 1px solid #e3e6ea;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+  position: relative;
+  overflow: visible !important;
+}
+
+/* 🎯 CELDAS ESPECIALES (1.1, 2.3, 3.3, 3.4) */
+.ba-day1-cell.special-cell {
+  background: #5e0829 !important;
+  border-color: #00524b !important;
+  color: #ffffff !important;
+  text-align: center;
+}
+
+.ba-day1-cell.special-cell * {
+  color: #ffffff !important;
+}
+
+.special-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.center-inner {
+  text-align: center;
+}
+
+/* NUEVO ENCABEZADO */
+.ba-day1-new-header {
+  font-size: 0.73rem;
+  font-weight: 700;
+  color: #7a0000;
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+/* ENCABEZADO ORIGINAL */
+.ba-day1-cell-header {
+  text-align: center;
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: #2c3e50;
+  padding-bottom: 0.25rem;
+}
+
+.ba-day1-cell-header.divided {
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* TEXTO PEQUEÑO */
+.ba-day1-cell-small {
+  text-align: center;
+  font-size: 0.68rem;
+  color: #faa508;
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+/* TEXTO EN MÓVIL (NO TOOLTIP) */
+.ba-day1-cell-text {
+  text-align: center;
+  font-size: 0.85rem;
+  color: #555;
+  margin-top: 6px;
+  white-space: normal !important;
+}
+
+/* ============================
+   TOOLTIP SOLO DESKTOP
+============================ */
+@media (min-width: 992px) {
+  .ba-day1-cell-text {
+    display: none !important;
+  }
+
+  .ba-day1-tooltip {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffffff;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #7a0000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    width: max-content;
+    max-width: 90%;
+    min-width: 260px;
+    white-space: normal !important;
+    overflow-wrap: break-word !important;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #333;
+    z-index: 30;
+  }
+
+  .ba-day1-cell:hover:not(.special-cell) .ba-day1-tooltip {
+    display: block;
+  }
+}
+
+/* ============================
+   RESPONSIVE
+============================ */
+@media (max-width: 992px) {
+  .ba-day1-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .ba-day1-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .ba-day1-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   DESACTIVAR TOOLTIP EN PANTALLAS PEQUEÑAS
+=============================================== */
+@media (max-width: 991px) {
+  .ba-day1-tooltip {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /* Asegura que el texto móvil SIEMPRE se muestre completo */
+  .ba-day1-cell-text {
+    display: block !important;
+    white-space: normal !important;
+    overflow: visible !important;
+  }
+}

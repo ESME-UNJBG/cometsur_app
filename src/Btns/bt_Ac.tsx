@@ -45,7 +45,7 @@ const Ac: React.FC<AcProps> = ({ onClose }) => {
               onClick={handleClose}
             ></button>
 
-            <h5>Actualisar</h5>
+            <h5>Actualizar</h5>
 
             <div className="es-buttons">
               <button
