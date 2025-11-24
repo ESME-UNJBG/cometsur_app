@@ -19,19 +19,26 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
       return;
     }
 
+    // === FILTRAR emails de getnada.com ===
+    const usuariosFiltrados = usuarios.filter(
+      (u) => !u.email?.toLowerCase().endsWith("@getnada.com")
+    );
+
+    if (usuariosFiltrados.length === 0) {
+      alert("Todos los usuarios fueron filtrados por email @getnada.com");
+      return;
+    }
+
     const workbook = new ExcelJS.Workbook();
     const ws = workbook.addWorksheet("Asistentes");
 
-    // === Parámetros del QR ===
-    const QR_PX = 64; // Tamaño del QR
+    const QR_PX = 64;
     const PIXELS_PER_EXCEL_COL_UNIT = 7.5;
     const PIXELS_PER_EXCEL_ROW_PT = 1.33;
 
-    // === Ajustes automáticos ===
-    const qrColumnWidth = QR_PX / PIXELS_PER_EXCEL_COL_UNIT + 2; // margen extra
+    const qrColumnWidth = QR_PX / PIXELS_PER_EXCEL_COL_UNIT + 2;
     const qrRowHeight = QR_PX / PIXELS_PER_EXCEL_ROW_PT + 10;
 
-    // === Definir columnas ===
     ws.columns = [
       { header: "Nombre", key: "name", width: 50 },
       { header: "QR", key: "qr", width: qrColumnWidth },
@@ -42,7 +49,6 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
       { header: "Email", key: "email", width: 45 },
     ];
 
-    // === Encabezado estilizado ===
     const header = ws.getRow(1);
     header.height = 26;
     header.eachCell((cell) => {
@@ -61,9 +67,9 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
       };
     });
 
-    // === Agregar usuarios y QRs ===
-    for (let i = 0; i < usuarios.length; i++) {
-      const u = usuarios[i];
+    // === Agregar usuarios filtrados ===
+    for (let i = 0; i < usuariosFiltrados.length; i++) {
+      const u = usuariosFiltrados[i];
       const excelRowIndex = i + 2;
       const codigo = `Cometsur-${(i + 1).toString().padStart(3, "0")}`;
 
@@ -78,7 +84,6 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
 
       ws.getRow(excelRowIndex).height = qrRowHeight;
 
-      // === Generar QR ===
       const qrDataUrl = await QRCode.toDataURL(u._id, {
         width: QR_PX,
         margin: 0,
@@ -89,16 +94,14 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
         extension: "png",
       });
 
-      // === Cálculos de centrado ===
-      const colIndexForQR = 2; // Columna B
+      const colIndexForQR = 2;
       const colWidthPx =
         ws.getColumn(colIndexForQR).width! * PIXELS_PER_EXCEL_COL_UNIT;
       const rowHeightPx =
         ws.getRow(excelRowIndex).height! * PIXELS_PER_EXCEL_ROW_PT;
 
-      // Ajustes finos 👇
-      const moveRight = 0.3; // mueve más a la derecha
-      const moveDown = 0.05; // baja un poco más
+      const moveRight = 0.3;
+      const moveDown = 0.05;
 
       const tlCol =
         colIndexForQR - 1 + (colWidthPx - QR_PX) / (2 * colWidthPx) + moveRight;
@@ -115,7 +118,6 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
       });
     }
 
-    // === Bordes y alineación ===
     ws.eachRow((row) => {
       row.eachCell((cell) => {
         cell.alignment = { horizontal: "center", vertical: "middle" };
@@ -128,7 +130,6 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
       });
     });
 
-    // === Exportar Excel ===
     const buffer = await workbook.xlsx.writeBuffer();
     saveAs(new Blob([buffer]), "Lista_Asistentes.xlsx");
   };
