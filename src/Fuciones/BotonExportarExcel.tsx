@@ -19,7 +19,6 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
       return;
     }
 
-    // === FILTRAR emails de getnada.com ===
     const usuariosFiltrados = usuarios.filter(
       (u) => !u.email?.toLowerCase().endsWith("@getnada.com")
     );
@@ -30,7 +29,11 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
     }
 
     const workbook = new ExcelJS.Workbook();
-    const ws = workbook.addWorksheet("Asistentes");
+
+    // ======================================================
+    // ===================  HOJA 1  =========================
+    // ======================================================
+    const ws1 = workbook.addWorksheet("Asistentes");
 
     const QR_PX = 64;
     const PIXELS_PER_EXCEL_COL_UNIT = 7.5;
@@ -39,7 +42,7 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
     const qrColumnWidth = QR_PX / PIXELS_PER_EXCEL_COL_UNIT + 2;
     const qrRowHeight = QR_PX / PIXELS_PER_EXCEL_ROW_PT + 10;
 
-    ws.columns = [
+    ws1.columns = [
       { header: "Nombre", key: "name", width: 50 },
       { header: "QR", key: "qr", width: qrColumnWidth },
       { header: "Código", key: "codigo", width: 18 },
@@ -49,9 +52,9 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
       { header: "Email", key: "email", width: 45 },
     ];
 
-    const header = ws.getRow(1);
-    header.height = 26;
-    header.eachCell((cell) => {
+    const header1 = ws1.getRow(1);
+    header1.height = 26;
+    header1.eachCell((cell) => {
       cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
       cell.alignment = { horizontal: "center", vertical: "middle" };
       cell.fill = {
@@ -67,13 +70,20 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
       };
     });
 
-    // === Agregar usuarios filtrados ===
+    const listaConCodigo: Array<User & { codigo: string }> = [];
+
     for (let i = 0; i < usuariosFiltrados.length; i++) {
       const u = usuariosFiltrados[i];
       const excelRowIndex = i + 2;
+
       const codigo = `Cometsur-${(i + 1).toString().padStart(3, "0")}`;
 
-      ws.addRow({
+      listaConCodigo.push({
+        ...u,
+        codigo,
+      });
+
+      ws1.addRow({
         name: u.name,
         codigo,
         importe: u.importe,
@@ -82,7 +92,7 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
         email: u.email,
       });
 
-      ws.getRow(excelRowIndex).height = qrRowHeight;
+      ws1.getRow(excelRowIndex).height = qrRowHeight;
 
       const qrDataUrl = await QRCode.toDataURL(u._id, {
         width: QR_PX,
@@ -95,30 +105,21 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
       });
 
       const colIndexForQR = 2;
-      const colWidthPx =
-        ws.getColumn(colIndexForQR).width! * PIXELS_PER_EXCEL_COL_UNIT;
-      const rowHeightPx =
-        ws.getRow(excelRowIndex).height! * PIXELS_PER_EXCEL_ROW_PT;
 
       const moveRight = 0.3;
       const moveDown = 0.05;
 
-      const tlCol =
-        colIndexForQR - 1 + (colWidthPx - QR_PX) / (2 * colWidthPx) + moveRight;
-      const tlRow =
-        excelRowIndex -
-        1 +
-        (rowHeightPx - QR_PX) / (2 * rowHeightPx) +
-        moveDown;
-
-      ws.addImage(imageId, {
-        tl: { col: tlCol, row: tlRow },
+      ws1.addImage(imageId, {
+        tl: {
+          col: colIndexForQR - 1 + moveRight,
+          row: excelRowIndex - 1 + moveDown,
+        },
         ext: { width: QR_PX, height: QR_PX },
         editAs: "oneCell",
       });
     }
 
-    ws.eachRow((row) => {
+    ws1.eachRow((row) => {
       row.eachCell((cell) => {
         cell.alignment = { horizontal: "center", vertical: "middle" };
         cell.border = {
@@ -129,6 +130,100 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
         };
       });
     });
+
+    // ======================================================
+    // ===================  FUNCION DE ESTILO  ==============
+    // ======================================================
+    const aplicarEstilos = (ws: ExcelJS.Worksheet) => {
+      const header = ws.getRow(1);
+      header.height = 26;
+
+      header.eachCell((cell) => {
+        cell.font = { bold: true, color: { argb: "FFFFFFFF" } };
+        cell.alignment = { horizontal: "center", vertical: "middle" };
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FF1F4E78" },
+        };
+        cell.border = {
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" },
+        };
+      });
+
+      ws.eachRow((row, index) => {
+        if (index === 1) return; // Encabezado ya está estilizado
+
+        row.eachCell((cell) => {
+          cell.alignment = { horizontal: "center", vertical: "middle" };
+          cell.border = {
+            top: { style: "thin" },
+            left: { style: "thin" },
+            bottom: { style: "thin" },
+            right: { style: "thin" },
+          };
+        });
+      });
+    };
+
+    // ======================================================
+    // ===================  HOJA 2  =========================
+    // ======================================================
+    const ws2 = workbook.addWorksheet("Baucher_Ordenado");
+
+    ws2.columns = [
+      { header: "Nombre", key: "name", width: 40 },
+      { header: "Código", key: "codigo", width: 18 },
+      { header: "Baucher", key: "baucher", width: 20 },
+      { header: "Importe", key: "importe", width: 12 },
+    ];
+
+    const ordenBaucher = [...listaConCodigo].sort((a, b) =>
+      a.baucher.localeCompare(b.baucher)
+    );
+
+    ordenBaucher.forEach((u) => {
+      ws2.addRow({
+        name: u.name,
+        codigo: u.codigo,
+        baucher: u.baucher,
+        importe: u.importe,
+      });
+    });
+
+    aplicarEstilos(ws2);
+
+    // ======================================================
+    // ===================  HOJA 3  =========================
+    // ======================================================
+    const ws3 = workbook.addWorksheet("Universidad_Codigos");
+
+    ws3.columns = [
+      { header: "Nombre", key: "name", width: 40 },
+      { header: "Universidad", key: "university", width: 50 },
+      { header: "Código", key: "codigo", width: 18 },
+    ];
+
+    const ordenUniversidad = [...listaConCodigo].sort((a, b) =>
+      a.university.localeCompare(b.university)
+    );
+
+    ordenUniversidad.forEach((u) => {
+      ws3.addRow({
+        name: u.name,
+        university: u.university,
+        codigo: u.codigo,
+      });
+    });
+
+    aplicarEstilos(ws3);
+
+    // ======================================================
+    // ===================  DESCARGA  =======================
+    // ======================================================
 
     const buffer = await workbook.xlsx.writeBuffer();
     saveAs(new Blob([buffer]), "Lista_Asistentes.xlsx");
