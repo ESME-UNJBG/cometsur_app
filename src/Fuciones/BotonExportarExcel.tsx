@@ -155,8 +155,7 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
       });
 
       ws.eachRow((row, index) => {
-        if (index === 1) return; // Encabezado ya está estilizado
-
+        if (index === 1) return;
         row.eachCell((cell) => {
           cell.alignment = { horizontal: "center", vertical: "middle" };
           cell.border = {
@@ -178,6 +177,7 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
       { header: "Nombre", key: "name", width: 40 },
       { header: "Código", key: "codigo", width: 18 },
       { header: "Baucher", key: "baucher", width: 20 },
+      { header: "Pago", key: "pago", width: 15 }, // ⭐ NUEVO ⭐
       { header: "Importe", key: "importe", width: 12 },
     ];
 
@@ -190,6 +190,7 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
         name: u.name,
         codigo: u.codigo,
         baucher: u.baucher,
+        pago: u.pago, // ⭐ NUEVO ⭐
         importe: u.importe,
       });
     });
@@ -224,7 +225,6 @@ const BotonExportarExcel: React.FC<BotonExportarExcelProps> = ({
     // ======================================================
     // ===================  DESCARGA  =======================
     // ======================================================
-
     const buffer = await workbook.xlsx.writeBuffer();
     saveAs(new Blob([buffer]), "Lista_Asistentes.xlsx");
   };
